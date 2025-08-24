@@ -64,6 +64,7 @@ export function ConfigProvider({
       pingChartMaxPoints:
         theme.pingChartMaxPoints || DEFAULT_CONFIG.pingChartMaxPoints,
       backgroundImage,
+      enableSwap: theme.enableSwap ?? DEFAULT_CONFIG.enableSwap,
     }),
     [theme, backgroundImage, publicSettings?.sitename]
   );

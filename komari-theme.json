@@ -2,7 +2,7 @@
     "name": "Komari Theme PurCart",
     "short": "PurCarte",
     "description": "A frosted glass theme for Komari",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "author": "Montia & Gemini",
     "url": "https://github.com/Montia37/Komari-theme-purcarte",
     "preview": "preview.png",
@@ -107,6 +107,13 @@
                 "type": "switch",
                 "default": true,
                 "help": "启用后默认显示分组栏"
+            },
+            {
+                "key": "enableSwap",
+                "name": "启用 SWAP 显示",
+                "type": "switch",
+                "default": true,
+                "help": "启用后默认显示 SWAP 信息"
             },
             {
                 "name": "Instance 设置",

@@ -8,7 +8,7 @@ import Loading from "@/components/loading";
 import type { NodeWithStatus } from "@/types/node";
 import { useNodeData } from "@/contexts/NodeDataContext";
 import { useLiveData } from "@/contexts/LiveDataContext";
-import { useConfigItem } from "@/config";
+import { useAppConfig } from "@/config";
 
 interface HomePageProps {
   viewMode: "grid" | "table";
@@ -19,8 +19,7 @@ const HomePage: React.FC<HomePageProps> = ({ viewMode, searchTerm }) => {
   const { nodes: staticNodes, loading, getGroups } = useNodeData();
   const { liveData } = useLiveData();
   const [selectedGroup, setSelectedGroup] = useState("所有");
-  const enableGroupedBar = useConfigItem("enableGroupedBar");
-  const enableStatsBar = useConfigItem("enableStatsBar");
+  const { enableGroupedBar, enableStatsBar, enableSwap } = useAppConfig();
   const [displayOptions, setDisplayOptions] = useState({
     time: true,
     online: true,
@@ -125,12 +124,22 @@ const HomePage: React.FC<HomePageProps> = ({ viewMode, searchTerm }) => {
                     ? "grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4"
                     : "min-w-[1080px]"
                 }>
-                {viewMode === "table" && <NodeListHeader />}
+                {viewMode === "table" && (
+                  <NodeListHeader enableSwap={enableSwap} />
+                )}
                 {filteredNodes.map((node: NodeWithStatus) =>
                   viewMode === "grid" ? (
-                    <NodeCard key={node.uuid} node={node} />
+                    <NodeCard
+                      key={node.uuid}
+                      node={node}
+                      enableSwap={enableSwap}
+                    />
                   ) : (
-                    <NodeListItem key={node.uuid} node={node} />
+                    <NodeListItem
+                      key={node.uuid}
+                      node={node}
+                      enableSwap={enableSwap}
+                    />
                   )
                 )}
               </div>

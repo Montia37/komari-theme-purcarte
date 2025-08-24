@@ -16,9 +16,10 @@ import { CircleProgress } from "../ui/circle-progress";
 
 interface NodeCardProps {
   node: NodeWithStatus;
+  enableSwap: boolean | undefined;
 }
 
-export const NodeCard = ({ node }: NodeCardProps) => {
+export const NodeCard = ({ node, enableSwap }: NodeCardProps) => {
   const {
     stats,
     isOnline,
@@ -104,7 +105,7 @@ export const NodeCard = ({ node }: NodeCardProps) => {
             <span className="w-12 text-right">{memUsage.toFixed(0)}%</span>
           </div>
         </div>
-        {node.swap_total > 0 ? (
+        {enableSwap && (
           <div className="flex items-center justify-between">
             <span className="text-secondary-foreground">SWAP</span>
             <div className="w-3/4 flex items-center gap-2">
@@ -112,15 +113,11 @@ export const NodeCard = ({ node }: NodeCardProps) => {
                 value={swapUsage}
                 className={getProgressBarClass(swapUsage)}
               />
-              <span className="w-12 text-right">{swapUsage.toFixed(0)}%</span>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between">
-            <span className="text-secondary-foreground">SWAP</span>
-            <div className="w-3/4 flex items-center gap-2">
-              <ProgressBar value={0} />
-              <span className="w-12 text-right">OFF</span>
+              {node.swap_total > 0 ? (
+                <span className="w-12 text-right">{swapUsage.toFixed(0)}%</span>
+              ) : (
+                <span className="w-12 text-right">OFF</span>
+              )}
             </div>
           </div>
         )}

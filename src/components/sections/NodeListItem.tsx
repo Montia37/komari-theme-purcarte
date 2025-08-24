@@ -9,9 +9,10 @@ import { CircleProgress } from "../ui/circle-progress";
 
 interface NodeListItemProps {
   node: NodeWithStatus;
+  enableSwap: boolean | undefined;
 }
 
-export const NodeListItem = ({ node }: NodeListItemProps) => {
+export const NodeListItem = ({ node, enableSwap }: NodeListItemProps) => {
   const {
     stats,
     isOnline,
@@ -25,9 +26,11 @@ export const NodeListItem = ({ node }: NodeListItemProps) => {
     trafficPercentage,
   } = useNodeCommons(node);
 
+  const gridCols = enableSwap ? "grid-cols-10" : "grid-cols-9";
+
   return (
     <div
-      className={`grid grid-cols-10 text-center shadow-md gap-4 p-2 text-nowrap items-center rounded-lg ${
+      className={`grid ${gridCols} text-center shadow-md gap-4 p-2 text-nowrap items-center rounded-lg ${
         isOnline
           ? ""
           : "striped-bg-red-translucent-diagonal ring-2 ring-red-500/50"
@@ -67,19 +70,21 @@ export const NodeListItem = ({ node }: NodeListItemProps) => {
           </div>
         </div>
       </div>
-      <div className="col-span-1 flex items-center text-left">
-        <MemoryStickIcon className="inline-block size-5 flex-shrink-0 text-purple-600" />
-        {node.swap_total > 0 ? (
-          <div className="ml-1 w-full items-center justify-center">
-            <div>{formatBytes(node.swap_total)}</div>
-            <div className="mt-1">
-              {isOnline ? `${swapUsage.toFixed(1)}%` : "N/A"}
+      {enableSwap && (
+        <div className="col-span-1 flex items-center text-left">
+          <MemoryStickIcon className="inline-block size-5 flex-shrink-0 text-purple-600" />
+          {node.swap_total > 0 ? (
+            <div className="ml-1 w-full items-center justify-center">
+              <div>{formatBytes(node.swap_total)}</div>
+              <div className="mt-1">
+                {isOnline ? `${swapUsage.toFixed(1)}%` : "N/A"}
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="ml-1 w-full item-center justify-center">OFF</div>
-        )}
-      </div>
+          ) : (
+            <div className="ml-1 w-full item-center justify-center">OFF</div>
+          )}
+        </div>
+      )}
       <div className="col-span-1 flex items-center text-left">
         <HardDriveIcon className="inline-block size-5 flex-shrink-0 text-red-600" />
         <div className="ml-1 w-full items-center justify-center">

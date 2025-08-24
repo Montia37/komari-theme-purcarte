@@ -15,6 +15,7 @@ export interface ConfigOptions {
   enableInstanceDetail?: boolean; // 是否启用实例详情
   enablePingChart?: boolean; // 是否启用延迟图表
   pingChartMaxPoints?: number; // 延迟图表最大点数
+  enableSwap?: boolean; // 是否启用SWAP显示
 }
 
 // 默认配置值
@@ -35,4 +36,5 @@ export const DEFAULT_CONFIG: ConfigOptions = {
   enableInstanceDetail: true,
   enablePingChart: true,
   pingChartMaxPoints: 0,
+  enableSwap: true,
 };
