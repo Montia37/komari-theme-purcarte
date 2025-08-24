@@ -13,8 +13,17 @@ export const formatBytes = (bytes: number, isSpeed = false, decimals = 2) => {
   const sizes = isSpeed
     ? ["B/s", "KB/s", "MB/s", "GB/s", "TB/s"]
     : ["B", "KB", "MB", "GB", "TB", "PB", "EB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+
+  let i = Math.floor(Math.log(bytes) / Math.log(k));
+  let value = bytes / Math.pow(k, i);
+
+  // 如果值大于等于1000，则进位到下一个单位
+  if (value >= 1000 && i < sizes.length - 1) {
+    i++;
+    value = bytes / Math.pow(k, i);
+  }
+
+  return parseFloat(value.toFixed(dm)) + " " + sizes[i];
 };
 
 // Helper function to format uptime
