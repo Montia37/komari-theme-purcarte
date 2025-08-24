@@ -188,7 +188,7 @@ export const NodeCard = ({ node }: NodeCardProps) => {
             <div className="flex items-center gap-1">{expired_at}</div>
           </div>
           <div className="border-l border-border/60 mx-2"></div>
-          <div className="flex justify-start w-full">
+          <div className="flex justify-end w-full">
             <span className="text-secondary-foreground">在线：</span>
             <span>
               {isOnline && stats ? formatUptime(stats.uptime) : "离线"}

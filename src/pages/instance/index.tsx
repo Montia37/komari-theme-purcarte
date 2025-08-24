@@ -11,6 +11,7 @@ const PingChart = lazy(() => import("./PingChart"));
 import Loading from "@/components/loading";
 import Flag from "@/components/sections/Flag";
 import { useConfigItem } from "@/config";
+import { useIsMobile } from "@/hooks/useMobile";
 
 const InstancePage = () => {
   const { uuid } = useParams<{ uuid: string }>();
@@ -28,6 +29,7 @@ const InstancePage = () => {
   const [pingHours, setPingHours] = useState<number>(1); // 默认1小时
   const enableInstanceDetail = useConfigItem("enableInstanceDetail");
   const enablePingChart = useConfigItem("enablePingChart");
+  const isMobile = useIsMobile();
 
   const maxRecordPreserveTime = publicSettings?.record_preserve_time || 0; // 默认0表示关闭
   const maxPingRecordPreserveTime =
@@ -106,7 +108,7 @@ const InstancePage = () => {
 
   return (
     <div className="w-[90%] max-w-screen-2xl mx-auto flex-1 flex flex-col pb-15 p-4 space-y-4">
-      <div className="flex items-center justify-between bg-card box-border border rounded-lg p-4 mb-4 text-secondary-foreground">
+      <div className="flex items-center justify-between bg-card box-border border border-border rounded-lg p-4 mb-4 text-secondary-foreground">
         <div className="flex items-center gap-2 min-w-0">
           <Button
             className="bg-card flex-shrink-0"
@@ -127,24 +129,31 @@ const InstancePage = () => {
 
       {enableInstanceDetail && <Instance node={node as NodeWithStatus} />}
 
-      <div className="flex justify-center w-full">
-        <div className="bg-card border rounded-lg py-3 px-4">
+      <div className="flex flex-col items-center w-full space-y-4">
+        <div className="bg-card box-border border border-border rounded-lg p-2">
           <div className="flex justify-center space-x-2">
             <Button
               variant={chartType === "load" ? "secondary" : "ghost"}
+              size="sm"
               onClick={() => setChartType("load")}>
               负载
             </Button>
             {enablePingChart && (
               <Button
                 variant={chartType === "ping" ? "secondary" : "ghost"}
+                size="sm"
                 onClick={() => setChartType("ping")}>
                 延迟
               </Button>
             )}
           </div>
+        </div>
+        <div
+          className={`bg-card box-border border border-border justify-center rounded-lg p-2 ${
+            isMobile ? "w-full" : ""
+          }`}>
           {chartType === "load" ? (
-            <div className="flex justify-center space-x-2 mt-2">
+            <div className="flex space-x-2 overflow-x-auto whitespace-nowrap">
               {loadTimeRanges.map((range) => (
                 <Button
                   key={range.label}
@@ -156,7 +165,7 @@ const InstancePage = () => {
               ))}
             </div>
           ) : (
-            <div className="flex justify-center space-x-2 mt-2">
+            <div className="flex space-x-2 overflow-x-auto whitespace-nowrap">
               {pingTimeRanges.map((range) => (
                 <Button
                   key={range.label}
