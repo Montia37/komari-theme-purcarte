@@ -1,10 +1,9 @@
-name: Build Preview Theme Package
+name: Build Theme Package
 
 on:
-  workflow_dispatch:
-    inputs:
-      ref:
-        default: "dev"
+  push:
+    branches:
+      - dev
 
 jobs:
   build-and-package:
@@ -41,9 +40,9 @@ jobs:
 
           # Update komari-theme.json with new version and description
           jq --arg version "$VERSION_DATE" \
-              --arg desc "Preview theme for PurCarte (commit: $COMMIT_HASH)" \
-              '.name = .name + " (Preview)" | .short = .short + "Preview" | .version = $version | .description = $desc' \
-              komari-theme.json > komari-theme-updated.json
+             --arg desc "Preview theme for Komari Monitor (commit: $COMMIT_HASH)" \
+             '.version = $version | .description = $desc' \
+             komari-theme.json > komari-theme-updated.json
 
           mv komari-theme-updated.json komari-theme.json
 
