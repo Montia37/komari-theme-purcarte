@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useMemo } from "react";
+import { type ReactNode, useCallback, useMemo, useEffect } from "react";
 import { useAppConfig } from "@/config/hooks";
 import { useIsMobile } from "@/hooks/useMobile";
 import { useTheme } from "@/hooks/useTheme";
@@ -57,20 +57,41 @@ export function DynamicContent({ children }: { children: ReactNode }) {
     return `:root { ${styles.join(" ")} }`;
   }, [config, imageUrl]);
 
+  useEffect(() => {
+    const imageBackground = document.getElementById("image-background");
+    const videoBackground = document.getElementById(
+      "video-background"
+    ) as HTMLVideoElement;
+    const [size, position] = config.backgroundAlignment
+      .split(",")
+      .map((s) => s.trim());
+
+    if (imageBackground) {
+      imageBackground.style.backgroundImage = `url(${imageUrl})`;
+      imageBackground.style.backgroundSize = size;
+      imageBackground.style.backgroundPosition = position;
+    }
+
+    if (videoBackground) {
+      if (config.enableVideoBackground && videoUrl) {
+        videoBackground.src = videoUrl;
+        videoBackground.style.objectFit = size;
+        videoBackground.style.objectPosition = position;
+        videoBackground.style.display = "block";
+      } else {
+        videoBackground.style.display = "none";
+      }
+    }
+  }, [
+    imageUrl,
+    videoUrl,
+    config.backgroundAlignment,
+    config.enableVideoBackground,
+  ]);
+
   return (
     <>
       <style>{dynamicStyles}</style>
-      {config.enableVideoBackground && videoUrl && (
-        <video
-          key={videoUrl}
-          src={videoUrl}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="fixed bg-center top-0 min-w-full min-h-full w-auto h-auto -z-1 object-cover"
-        />
-      )}
       <div className="fade-in">{children}</div>
     </>
   );

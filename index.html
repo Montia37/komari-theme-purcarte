@@ -21,7 +21,21 @@
     <meta name="description" content="A simple server monitor tool." />
   </head>
   <body>
-    <div id="root"></div>
+    <div
+      id="background-container"
+      class="fixed top-0 left-0 w-full h-full z-[-1]">
+      <div
+        id="image-background"
+        class="absolute top-0 left-0 w-full h-full bg-cover bg-top bg-no-repeat z-10"></div>
+      <video
+        id="video-background"
+        class="absolute top-0 left-0 w-full h-full object-cover object-top z-20"
+        autoplay
+        loop
+        muted
+        playsinline></video>
+    </div>
+    <div id="root" class="relative z-30"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
