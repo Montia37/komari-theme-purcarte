@@ -28,6 +28,7 @@ const HomePage = lazy(() => import("@/pages/Home"));
 const InstancePage = lazy(() => import("@/pages/instance"));
 const NotFoundPage = lazy(() => import("@/pages/NotFound"));
 const PrivatePage = lazy(() => import("@/pages/Private"));
+const LiquidGlassDemo = lazy(() => import("@/test/LiquidGlassDemo"));
 
 const homeScrollState = {
   position: 0,
@@ -150,6 +151,18 @@ const AppRoutes = ({
                 </ScrollArea>
               }
             />
+            {import.meta.env.DEV && (
+              <Route
+                path="/liquid-glass-demo"
+                element={
+                  <ScrollArea className="h-full">
+                    <main className="w-full h-full mx-auto flex-1">
+                      <LiquidGlassDemo />
+                    </main>
+                  </ScrollArea>
+                }
+              />
+            )}
           </Routes>
         </Suspense>
       </div>

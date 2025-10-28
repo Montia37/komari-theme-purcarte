@@ -13,6 +13,7 @@ import Flag from "@/components/sections/Flag";
 import { useAppConfig } from "@/config";
 import { useIsMobile } from "@/hooks/useMobile";
 import { useLocale } from "@/config/hooks";
+import { Card } from "@/components/ui/card";
 
 const InstancePage = () => {
   const { uuid } = useParams<{ uuid: string }>();
@@ -168,76 +169,79 @@ const InstancePage = () => {
 
   return (
     <div className="text-card-foreground space-y-4 my-4 fade-in @container">
-      <div className="flex items-center justify-between purcarte-blur theme-card-style p-4 mb-4 text-primary">
-        <div className="flex items-center gap-2 min-w-0">
-          <Button
-            className="flex-shrink-0"
-            variant="outline"
-            size="icon"
-            onClick={() => navigate(-1)}>
-            <ArrowLeft />
-          </Button>
+      <Card>
+        <div className="flex items-center justify-between p-4 text-primary">
           <div className="flex items-center gap-2 min-w-0">
-            <Flag flag={node.region}></Flag>
-            <span className="text-xl md:text-2xl font-bold">{node.name}</span>
+            <Button
+              className="flex-shrink-0"
+              variant="outline"
+              size="icon"
+              onClick={() => navigate(-1)}>
+              <ArrowLeft />
+            </Button>
+            <div className="flex items-center gap-2 min-w-0">
+              <Flag flag={node.region}></Flag>
+              <span className="text-xl md:text-2xl font-bold">{node.name}</span>
+            </div>
+            <span className="text-sm text-secondary-foreground flex-shrink-0">
+              {isOnline ? t("node.online") : t("node.offline")}
+            </span>
           </div>
-          <span className="text-sm text-secondary-foreground flex-shrink-0">
-            {isOnline ? t("node.online") : t("node.offline")}
-          </span>
         </div>
-      </div>
+      </Card>
 
       {enableInstanceDetail && node && <Instance node={node} />}
 
       <div className="flex flex-col items-center w-full space-y-4">
-        <div className="purcarte-blur theme-card-style p-2">
-          <div className="flex justify-center space-x-2">
-            <Button
-              variant={chartType === "load" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => handleChartTypeChange("load")}>
-              {t("instancePage.optionLoad")}
-            </Button>
-            {enablePingChart && (
+        <Card>
+          <div className="p-2">
+            <div className="flex justify-center space-x-2">
               <Button
-                variant={chartType === "ping" ? "default" : "ghost"}
+                variant={chartType === "load" ? "default" : "ghost"}
                 size="sm"
-                onClick={() => handleChartTypeChange("ping")}>
-                {t("instancePage.optionPing")}
+                onClick={() => handleChartTypeChange("load")}>
+                {t("instancePage.optionLoad")}
               </Button>
+              {enablePingChart && (
+                <Button
+                  variant={chartType === "ping" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => handleChartTypeChange("ping")}>
+                  {t("instancePage.optionPing")}
+                </Button>
+              )}
+            </div>
+          </div>
+        </Card>
+        <Card>
+          <div className={`justify-center p-2 ${isMobile ? "w-full" : ""}`}>
+            {chartType === "load" ? (
+              <div className="flex space-x-2 overflow-x-auto whitespace-nowrap">
+                {loadTimeRanges.map((range) => (
+                  <Button
+                    key={range.label}
+                    variant={loadHours === range.hours ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setLoadHours(range.hours)}>
+                    {range.label}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="flex space-x-2 overflow-x-auto whitespace-nowrap">
+                {pingTimeRanges.map((range) => (
+                  <Button
+                    key={range.label}
+                    variant={pingHours === range.hours ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setPingHours(range.hours)}>
+                    {range.label}
+                  </Button>
+                ))}
+              </div>
             )}
           </div>
-        </div>
-        <div
-          className={`purcarte-blur theme-card-style justify-center p-2 ${
-            isMobile ? "w-full" : ""
-          }`}>
-          {chartType === "load" ? (
-            <div className="flex space-x-2 overflow-x-auto whitespace-nowrap">
-              {loadTimeRanges.map((range) => (
-                <Button
-                  key={range.label}
-                  variant={loadHours === range.hours ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setLoadHours(range.hours)}>
-                  {range.label}
-                </Button>
-              ))}
-            </div>
-          ) : (
-            <div className="flex space-x-2 overflow-x-auto whitespace-nowrap">
-              {pingTimeRanges.map((range) => (
-                <Button
-                  key={range.label}
-                  variant={pingHours === range.hours ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setPingHours(range.hours)}>
-                  {range.label}
-                </Button>
-              ))}
-            </div>
-          )}
-        </div>
+        </Card>
       </div>
 
       <div

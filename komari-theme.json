@@ -74,6 +74,13 @@
                 "help": "调整背景图片和视频的对齐方式，使用“,”分隔背景大小和位置两个属性，背景大小可选 cover（覆盖）,contain（包含）,fill（填充）；背景位置可选 center（居中）,top（顶部）,bottom（底部）,left（左侧）,right（右侧），eg: cover,top"
             },
             {
+                "key": "enableLiquidGlassEffect",
+                "name": "启用液态玻璃效果",
+                "type": "switch",
+                "default": false,
+                "help": "启用后将使主要容器拥有液态玻璃效果"
+            },
+            {
                 "key": "enableBlur",
                 "name": "启用磨砂玻璃效果",
                 "type": "switch",

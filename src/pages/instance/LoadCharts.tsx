@@ -245,83 +245,85 @@ const LoadCharts = memo(
           <div
             className="h-[150px] w-full px-2 pb-2 align-bottom"
             style={{ minHeight: 0 }}>
-            <ChartContainer config={chartConfig} className="h-full w-full">
-              <ChartComponent
-                data={config.data}
-                margin={chartMargin}
-                {...chartProps}>
-                <CartesianGrid
-                  strokeDasharray="2 4"
-                  stroke="var(--theme-line-muted-color)"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="time"
-                  tickLine={false}
-                  axisLine={{
-                    stroke: "var(--theme-text-muted-color)",
-                  }}
-                  tick={{
-                    fill: "var(--theme-text-muted-color)",
-                  }}
-                  tickFormatter={(value, index) =>
-                    loadChartTimeFormatter(
-                      value,
-                      index,
-                      chartDataLengthRef.current
-                    )
-                  }
-                  interval={0}
-                  height={20}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  domain={config.yAxisDomain}
-                  tickFormatter={config.yAxisFormatter}
-                  orientation="left"
-                  type="number"
-                  tick={{
-                    dx: -8,
-                    fill: "var(--theme-text-muted-color)",
-                  }}
-                  width={200}
-                  mirror={true}
-                />
-                <Tooltip
-                  cursor={false}
-                  content={(props: any) => (
-                    <CustomTooltip
-                      {...props}
-                      chartConfig={config}
-                      labelFormatter={(value) => lableFormatter(value, hours)}
-                    />
-                  )}
-                />
-                {config.series ? (
-                  config.series.map((series: any) => (
+            {!loading && !isDataEmpty && (
+              <ChartContainer config={chartConfig} className="h-full w-full">
+                <ChartComponent
+                  data={config.data}
+                  margin={chartMargin}
+                  {...chartProps}>
+                  <CartesianGrid
+                    strokeDasharray="2 4"
+                    stroke="var(--theme-line-muted-color)"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="time"
+                    tickLine={false}
+                    axisLine={{
+                      stroke: "var(--theme-text-muted-color)",
+                    }}
+                    tick={{
+                      fill: "var(--theme-text-muted-color)",
+                    }}
+                    tickFormatter={(value, index) =>
+                      loadChartTimeFormatter(
+                        value,
+                        index,
+                        chartDataLengthRef.current
+                      )
+                    }
+                    interval={0}
+                    height={20}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    domain={config.yAxisDomain}
+                    tickFormatter={config.yAxisFormatter}
+                    orientation="left"
+                    type="number"
+                    tick={{
+                      dx: -8,
+                      fill: "var(--theme-text-muted-color)",
+                    }}
+                    width={200}
+                    mirror={true}
+                  />
+                  <Tooltip
+                    cursor={false}
+                    content={(props: any) => (
+                      <CustomTooltip
+                        {...props}
+                        chartConfig={config}
+                        labelFormatter={(value) => lableFormatter(value, hours)}
+                      />
+                    )}
+                  />
+                  {config.series ? (
+                    config.series.map((series: any) => (
+                      <DataComponent
+                        key={series.dataKey}
+                        dataKey={series.dataKey}
+                        animationDuration={0}
+                        stroke={series.color}
+                        fill={config.type === "area" ? series.color : undefined}
+                        opacity={0.8}
+                        dot={false}
+                      />
+                    ))
+                  ) : (
                     <DataComponent
-                      key={series.dataKey}
-                      dataKey={series.dataKey}
+                      dataKey={config.dataKey}
                       animationDuration={0}
-                      stroke={series.color}
-                      fill={config.type === "area" ? series.color : undefined}
+                      stroke={config.color}
+                      fill={config.type === "area" ? config.color : undefined}
                       opacity={0.8}
                       dot={false}
                     />
-                  ))
-                ) : (
-                  <DataComponent
-                    dataKey={config.dataKey}
-                    animationDuration={0}
-                    stroke={config.color}
-                    fill={config.type === "area" ? config.color : undefined}
-                    opacity={0.8}
-                    dot={false}
-                  />
-                )}
-              </ChartComponent>
-            </ChartContainer>
+                  )}
+                </ChartComponent>
+              </ChartContainer>
+            )}
           </div>
         </Card>
       );
@@ -355,7 +357,7 @@ const LoadCharts = memo(
         )}
         <div
           className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
-          style={{ minHeight: 0, overflow: "hidden" }}>
+          style={{ minHeight: 0 }}>
           {chartConfigs.map(renderChart)}
         </div>
       </div>

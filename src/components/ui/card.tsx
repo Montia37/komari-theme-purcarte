@@ -1,20 +1,41 @@
 import * as React from "react";
-
 import { cn } from "@/utils";
+import { useAppConfig } from "@/config/hooks";
+import { LiquidGlassCard } from "./liquidGlassCard";
+import type { LiquidGlassCardProps } from "./liquidGlassCard";
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "purcarte-blur theme-card-style text-card-foreground",
-      className
-    )}
-    {...props}
-  />
-));
+type CardProps = React.HTMLAttributes<HTMLDivElement> &
+  Partial<
+    Omit<LiquidGlassCardProps, "children"> & { children: React.ReactNode }
+  >;
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, ...props }, ref) => {
+    const { enableLiquidGlassEffect } = useAppConfig();
+
+    if (enableLiquidGlassEffect) {
+      return (
+        <LiquidGlassCard
+          ref={ref}
+          className={cn("text-card-foreground", className)}
+          {...props}>
+          {props.children}
+        </LiquidGlassCard>
+      );
+    }
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "purcarte-blur theme-card-style text-card-foreground",
+          className
+        )}
+        {...props}
+      />
+    );
+  }
+);
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<

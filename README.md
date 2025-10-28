@@ -113,6 +113,11 @@
   - **默认值:** `cover,top`
   - **说明:** 调整背景图片和视频的对齐方式，使用“,”分隔背景大小和位置两个属性，背景大小可选 cover（覆盖）,contain（包含）,fill（填充）；背景位置可选 center（居中）,top（顶部）,bottom（底部）,left（左侧）,right（右侧），eg: cover,top
 
+- **启用液态玻璃效果** (`enableLiquidGlassEffect`)
+  - **类型:** `switch`
+  - **默认值:** `false`
+  - **说明:** 启用后将使主要容器拥有液态玻璃效果
+
 - **启用磨砂玻璃效果** (`enableBlur`)
   - **类型:** `switch`
   - **默认值:** `true`

@@ -8,6 +8,7 @@ import { SortToggleMenu } from "./SortToggleMenu";
 import { StatsToggleMenu } from "./StatsToggleMenu";
 import { useLocale } from "@/config/hooks";
 import type { StatsBarProps, SortKey } from "./types";
+import { Card } from "@/components/ui/card";
 export type { StatsBarProps };
 
 interface StatEntry {
@@ -184,9 +185,9 @@ export const StatsBar = (props: StatsBarProps) => {
   };
 
   return (
-    <div
+    <Card
       className={cn(
-        "purcarte-blur theme-card-style relative flex items-center text-primary my-4",
+        "relative flex items-center text-primary my-4",
         isMobile ? "text-xs p-2" : "text-sm px-4 min-w-[300px] min-h-[5rem]"
       )}>
       <div
@@ -235,6 +236,6 @@ export const StatsBar = (props: StatsBarProps) => {
           />
         </div>
       )}
-    </div>
+    </Card>
   );
 };
