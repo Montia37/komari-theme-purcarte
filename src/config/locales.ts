@@ -43,6 +43,7 @@ export const defaultTexts = {
   },
   homePage: {
     loadingData: "正在努力获取数据中...",
+    noDetailsAvailable: "未启用详细信息与延迟图表",
     errorFetchingNodes: "获取节点数据失败",
     noNodes: "暂无节点数据",
     retryFetchingNodes: "获取节点数据失败，请重试",

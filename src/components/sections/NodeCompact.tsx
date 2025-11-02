@@ -41,7 +41,8 @@ const NodeDetailModal = ({ node, onClose }: NodeDetailModalProps) => {
     setTimeout(onClose, 300);
   };
 
-  const { pingChartTimeInPreview } = useAppConfig();
+  const { pingChartTimeInPreview, enableInstanceDetail, enablePingChart } =
+    useAppConfig();
   const { t } = useLocale();
 
   return (
@@ -67,8 +68,17 @@ const NodeDetailModal = ({ node, onClose }: NodeDetailModalProps) => {
           className="h-[calc(80vh-100px)]"
           viewportProps={{ className: "p-2" }}>
           <div className="space-y-4 @container">
-            <Instance node={node} />
-            <PingChart node={node} hours={pingChartTimeInPreview} />
+            {enableInstanceDetail && node && <Instance node={node} />}
+            {enablePingChart && (
+              <PingChart node={node} hours={pingChartTimeInPreview} />
+            )}
+            {!enableInstanceDetail && !enablePingChart && (
+              <div className="flex items-center justify-center h-[calc(80vh-132px)]">
+                <div className="text-lg">
+                  {t("homePage.noDetailsAvailable")}
+                </div>
+              </div>
+            )}
           </div>
         </ScrollArea>
       </div>

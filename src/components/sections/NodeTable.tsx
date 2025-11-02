@@ -1,4 +1,4 @@
-import { formatBytes, formatTrafficLimit, formatUptime } from "@/utils";
+import { cn, formatBytes, formatTrafficLimit, formatUptime } from "@/utils";
 import type { NodeData } from "@/types/node";
 import { Link } from "react-router-dom";
 import {
@@ -101,7 +101,8 @@ const NodeTableRow = ({
     trafficPercentage,
   } = useNodeCommons(node);
   const gridCols = enableSwap ? "grid-cols-9" : "grid-cols-8";
-  const { pingChartTimeInPreview } = useAppConfig();
+  const { pingChartTimeInPreview, enableInstanceDetail, enablePingChart } =
+    useAppConfig();
   const { t } = useLocale();
 
   return (
@@ -332,15 +333,28 @@ const NodeTableRow = ({
             setShouldRenderChart(false);
           }
         }}>
-        <div className="grid grid-cols-3 gap-4 p-2">
-          <div className="col-span-1 @container">
-            <Instance node={node} />
-          </div>
-          <div className="col-span-2">
-            {shouldRenderChart && (
-              <PingChart node={node} hours={pingChartTimeInPreview} />
-            )}
-          </div>
+        <div
+          className={cn(
+            "grid gap-4 p-2",
+            enablePingChart ? "grid-cols-3" : ""
+          )}>
+          {enableInstanceDetail && (
+            <div className="col-span-1 @container">
+              <Instance node={node} />
+            </div>
+          )}
+          {enablePingChart && (
+            <div className={enableInstanceDetail ? "col-span-2" : "col-span-3"}>
+              {shouldRenderChart && (
+                <PingChart node={node} hours={pingChartTimeInPreview} />
+              )}
+            </div>
+          )}
+          {!enableInstanceDetail && !enablePingChart && (
+            <div className="flex items-center justify-center">
+              <div className="text-lg">{t("homePage.noDetailsAvailable")}</div>
+            </div>
+          )}
         </div>
       </div>
     </Card>
