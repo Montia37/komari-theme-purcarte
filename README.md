@@ -170,6 +170,12 @@
 
 #### 标题栏设置
 
+- **标题栏样式** (`selectedHeaderStyle`)
+  - **类型:** `select`
+  - **可选项:** `fixed`, `levitation`
+  - **默认值:** `fixed`
+  - **说明:** 设置标题栏样式为 fixed（固定）或 levitation（悬浮）
+
 - **启用标题栏左侧 Logo** (`enableLogo`)
   - **类型:** `switch`
   - **默认值:** `false`
@@ -199,6 +205,14 @@
   - **类型:** `switch`
   - **默认值:** `true`
   - **说明:** 启用后默认在标题栏右侧显示管理按钮
+
+#### 底栏设置
+
+- **底栏样式** (`selectedFooterStyle`)
+  - **类型:** `select`
+  - **可选项:** `fixed`, `levitation`, `followContent`, `hidden`
+  - **默认值:** `levitation`
+  - **说明:** 设置底栏样式为 fixed（固定）, levitation（悬浮）, followContent（跟随内容）或 hidden（隐藏）
 
 #### 内容设置
 

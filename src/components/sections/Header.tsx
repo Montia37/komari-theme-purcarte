@@ -11,7 +11,7 @@ import {
   CircleUserIcon,
   Menu,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAppConfig } from "@/config";
 import { useTheme } from "@/hooks/useTheme";
@@ -31,6 +31,7 @@ import { StatsBar } from "../sections/StatsBar";
 import type { StatsBarProps } from "../sections/StatsBar";
 import EditButton from "../settings/EditButton";
 import { Card } from "../ui/card";
+import { cn } from "@/utils";
 
 interface HeaderProps extends Partial<StatsBarProps> {
   isPrivate?: boolean;
@@ -278,11 +279,12 @@ const SearchBar = ({
   );
 };
 
-export const Header = (props: HeaderProps) => {
+export const Header = forwardRef<HTMLElement, HeaderProps>((props, ref) => {
   const { isPrivate, searchTerm, setSearchTerm, setIsSettingsOpen } = props;
   const location = useLocation();
   const isInstancePage = location.pathname.startsWith("/instance");
   const {
+    selectedHeaderStyle,
     enableTitle,
     titleText,
     enableLogo,
@@ -300,7 +302,12 @@ export const Header = (props: HeaderProps) => {
   }, [titleText]);
 
   return (
-    <header className="sticky top-0 left-0 right-0 flex z-10">
+    <header
+      ref={ref}
+      className={cn(
+        selectedHeaderStyle === "levitation" ? "fixed" : "sticky",
+        "top-0 left-0 right-0 flex z-10"
+      )}>
       <Card className="rounded-none w-full flex items-center justify-center">
         <div className="w-(--main-width) max-w-screen-2xl py-2 flex items-center justify-between">
           <div className="flex items-center theme-text-shadow text-accent-foreground">
@@ -378,4 +385,4 @@ export const Header = (props: HeaderProps) => {
       </Card>
     </header>
   );
-};
+});

@@ -1,12 +1,33 @@
-import React from "react";
-import { useLocale } from "@/config/hooks";
+import { forwardRef } from "react";
+import { useAppConfig, useLocale } from "@/config/hooks";
 import { Card } from "../ui/card";
+import { cn } from "@/utils";
 
-const Footer: React.FC = () => {
+const Footer = forwardRef<
+  HTMLElement,
+  {
+    className?: string;
+  }
+>(({ className }, ref) => {
   const { t } = useLocale();
+  const { selectedFooterStyle } = useAppConfig();
   return (
-    <footer className="sticky bottom-0 left-0 right-0 flex z-10">
-      <Card className="p-2 rounded-none w-full flex items-center justify-center inset-shadow-sm inset-shadow-(color:--accent-a4)">
+    <footer
+      ref={ref}
+      className={cn(
+        selectedFooterStyle === "levitation"
+          ? "fixed"
+          : selectedFooterStyle === "followContent"
+          ? "mb-4"
+          : "",
+        "bottom-0 left-0 right-0 flex z-10",
+        className
+      )}>
+      <Card
+        className={cn(
+          selectedFooterStyle !== "followContent" ? "rounded-none" : "",
+          "p-2 w-full flex items-center justify-center inset-shadow-sm inset-shadow-(color:--accent-a4)"
+        )}>
         <p className="flex justify-center text-sm text-secondary-foreground theme-text-shadow whitespace-pre">
           {t("footer.poweredBy")}{" "}
           <a
@@ -29,6 +50,6 @@ const Footer: React.FC = () => {
       </Card>
     </footer>
   );
-};
+});
 
 export default Footer;

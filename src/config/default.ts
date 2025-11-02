@@ -17,12 +17,14 @@ export interface ConfigOptions {
   selectedDefaultView: ViewModeType; // 默认视图模式
   selectedDefaultAppearance: AppearanceType; // 默认外观模式
   statusCardsVisibility: string; // 状态卡片显示控制
+  selectedHeaderStyle: HeaderStyle; // 标题栏样式
   enableLogo: boolean; // 是否启用Logo
   logoUrl: string; // Logo图片URL
   enableTitle: boolean; // 是否启用标题
   titleText: string; // 标题文本
   enableSearchButton: boolean; // 是否启用搜索按钮
   enableAdminButton: boolean; // 是否启用管理员按钮
+  selectedFooterStyle: FooterStyle; // 页脚样式
   enableJsonRPC2Api: boolean; // 是否启用 JSON-RPC2 API 适配
   isShowStatsInHeader: boolean; // 是否在标题栏中显示统计信息
   mergeGroupsWithStats: boolean; // 是否在统计栏中合并分组
@@ -66,12 +68,14 @@ export const DEFAULT_CONFIG: ConfigOptions = {
   selectedDefaultAppearance: "system",
   statusCardsVisibility:
     "currentTime:true,currentOnline:true,regionOverview:true,trafficOverview:true,networkSpeed:true",
+  selectedHeaderStyle: "fixed",
   enableLogo: false,
   logoUrl: "/assets/logo.png",
   enableTitle: true,
   titleText: "Komari",
   enableSearchButton: true,
   enableAdminButton: true,
+  selectedFooterStyle: "fixed",
   enableJsonRPC2Api: false,
   isShowStatsInHeader: false,
   mergeGroupsWithStats: false,
@@ -160,3 +164,6 @@ export type SiteStatus =
   | "private-unauthenticated"
   | "private-authenticated"
   | "authenticated";
+
+export type HeaderStyle = "fixed" | "levitation";
+export type FooterStyle = "fixed" | "levitation" | "followContent" | "hidden";

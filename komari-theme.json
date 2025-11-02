@@ -155,6 +155,14 @@
                 "type": "title"
             },
             {
+                "key": "selectedHeaderStyle",
+                "name": "标题栏样式",
+                "type": "select",
+                "options": "fixed,levitation",
+                "default": "fixed",
+                "help": "设置标题栏样式为 fixed（固定）或 levitation（悬浮）"
+            },
+            {
                 "key": "enableLogo",
                 "name": "启用标题栏左侧 Logo",
                 "type": "switch",
@@ -196,6 +204,18 @@
                 "type": "switch",
                 "default": true,
                 "help": "启用后默认在标题栏右侧显示管理按钮"
+            },
+            {
+                "name": "底栏设置",
+                "type": "title"
+            },
+            {
+                "key": "selectedFooterStyle",
+                "name": "底栏样式",
+                "type": "select",
+                "options": "fixed,levitation,followContent,hidden",
+                "default": "levitation",
+                "help": "设置底栏样式为 fixed（固定）, levitation（悬浮）, followContent（跟随内容）或 hidden（隐藏）"
             },
             {
                 "name": "内容设置",
