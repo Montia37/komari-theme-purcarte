@@ -106,14 +106,15 @@ const NodeTableRow = ({
   const { t } = useLocale();
 
   return (
-    <Card>
+    <Card
+      className={
+        !isOnline
+          ? "striped-bg-red-translucent-diagonal ring-2 ring-red-500/50"
+          : ""
+      }>
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className={`grid ${gridCols} text-center gap-4 p-2 text-nowrap items-center ${
-          isOnline
-            ? ""
-            : "striped-bg-red-translucent-diagonal ring-2 ring-red-500/50"
-        } text-primary transition-colors duration-200 cursor-pointer`}>
+        className={`grid ${gridCols} text-center gap-4 p-2 text-nowrap items-center text-primary transition-colors duration-200 cursor-pointer`}>
         <div className="col-span-2 flex items-center text-left">
           <ChevronRight
             className={`transition-transform size-5 duration-300 flex-shrink-0 ${
