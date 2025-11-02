@@ -211,7 +211,7 @@
 - **底栏样式** (`selectedFooterStyle`)
   - **类型:** `select`
   - **可选项:** `fixed`, `levitation`, `followContent`, `hidden`
-  - **默认值:** `levitation`
+  - **默认值:** `fixed`
   - **说明:** 设置底栏样式为 fixed（固定）, levitation（悬浮）, followContent（跟随内容）或 hidden（隐藏）
 
 #### 内容设置

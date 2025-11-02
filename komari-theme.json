@@ -214,7 +214,7 @@
                 "name": "底栏样式",
                 "type": "select",
                 "options": "fixed,levitation,followContent,hidden",
-                "default": "levitation",
+                "default": "fixed",
                 "help": "设置底栏样式为 fixed（固定）, levitation（悬浮）, followContent（跟随内容）或 hidden（隐藏）"
             },
             {
