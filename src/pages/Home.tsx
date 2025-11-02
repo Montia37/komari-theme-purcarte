@@ -1,4 +1,3 @@
-import {} from "react";
 import { Button } from "@/components/ui/button";
 import { StatsBar } from "@/components/sections/StatsBar";
 import { NodeGridContainer } from "@/components/sections/NodeGrid";
@@ -9,7 +8,6 @@ import type { NodeData } from "@/types/node";
 import { useNodeData } from "@/contexts/NodeDataContext";
 import { useAppConfig } from "@/config";
 import { useTheme } from "@/hooks/useTheme";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Card,
   CardDescription,
@@ -19,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/useMobile";
 import { useLocale } from "@/config/hooks";
+import { cn } from "@/utils";
 
 interface HomePageProps {
   searchTerm: string;
@@ -78,26 +77,19 @@ const HomePage: React.FC<HomePageProps> = ({
     }
     if (viewMode === "table") {
       return (
-        <ScrollArea
-          className="purcarte-blur theme-card-style w-full"
-          viewportProps={{ className: "p-2" }}
-          showHorizontalScrollbar>
-          <div className="min-w-[1080px]">
-            <NodeTable
-              nodes={filteredNodes}
-              enableSwap={enableSwap}
-              enableListItemProgressBar={enableListItemProgressBar}
-              selectTrafficProgressStyle={selectTrafficProgressStyle}
-            />
-          </div>
-        </ScrollArea>
+        <NodeTable
+          nodes={filteredNodes}
+          enableSwap={enableSwap}
+          enableListItemProgressBar={enableListItemProgressBar}
+          selectTrafficProgressStyle={selectTrafficProgressStyle}
+        />
       );
     }
     return null;
   };
 
   return (
-    <div className="fade-in">
+    <div className="fade-in my-4">
       {enableStatsBar && (!isShowStatsInHeader || isMobile) && (
         <StatsBar
           displayOptions={statusCardsVisibility}
@@ -128,7 +120,7 @@ const HomePage: React.FC<HomePageProps> = ({
         </div>
       )}
 
-      <div className="space-y-4 my-4">
+      <div className={cn("space-y-4", viewMode === "table" && "-mx-2 -mb-2")}>
         {filteredNodes.length > 0 ? (
           renderContent()
         ) : (

@@ -13,6 +13,7 @@ import Flag from "@/components/sections/Flag";
 import { useAppConfig } from "@/config";
 import { useIsMobile } from "@/hooks/useMobile";
 import { useLocale } from "@/config/hooks";
+import { Card } from "@/components/ui/card";
 
 const InstancePage = () => {
   const { uuid } = useParams<{ uuid: string }>();
@@ -168,7 +169,7 @@ const InstancePage = () => {
 
   return (
     <div className="text-card-foreground space-y-4 my-4 fade-in @container">
-      <div className="flex items-center justify-between purcarte-blur theme-card-style p-4 mb-4 text-primary">
+      <Card className="flex items-center justify-between p-4 mb-4 text-primary">
         <div className="flex items-center gap-2 min-w-0">
           <Button
             className="flex-shrink-0"
@@ -185,12 +186,12 @@ const InstancePage = () => {
             {isOnline ? t("node.online") : t("node.offline")}
           </span>
         </div>
-      </div>
+      </Card>
 
       {enableInstanceDetail && node && <Instance node={node} />}
 
       <div className="flex flex-col items-center w-full space-y-4">
-        <div className="purcarte-blur theme-card-style p-2">
+        <Card className="p-2">
           <div className="flex justify-center space-x-2">
             <Button
               variant={chartType === "load" ? "default" : "ghost"}
@@ -207,11 +208,8 @@ const InstancePage = () => {
               </Button>
             )}
           </div>
-        </div>
-        <div
-          className={`purcarte-blur theme-card-style justify-center p-2 ${
-            isMobile ? "w-full" : ""
-          }`}>
+        </Card>
+        <Card className={`justify-center p-2 ${isMobile ? "w-full" : ""}`}>
           {chartType === "load" ? (
             <div className="flex space-x-2 overflow-x-auto whitespace-nowrap">
               {loadTimeRanges.map((range) => (
@@ -237,7 +235,7 @@ const InstancePage = () => {
               ))}
             </div>
           )}
-        </div>
+        </Card>
       </div>
 
       <div

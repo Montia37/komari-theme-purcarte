@@ -17,6 +17,8 @@ import Instance from "@/pages/instance/Instance";
 import PingChart from "@/pages/instance/PingChart";
 import { useAppConfig } from "@/config";
 import { useLocale } from "@/config/hooks";
+import { Card } from "../ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface NodeTableProps {
   nodes: NodeData[];
@@ -35,28 +37,32 @@ export const NodeTable = ({
   const gridCols = enableSwap ? "grid-cols-9" : "grid-cols-8";
 
   return (
-    <div className="space-y-1">
-      <div
-        className={`text-primary font-bold grid ${gridCols} text-center shadow-sm shadow-(color:--accent-4)/50 gap-4 p-2 items-center rounded-lg bg-card transition-colors duration-200`}>
-        <div className="col-span-2">{t("node.name")}</div>
-        <div className="col-span-1">{t("node.cpu")}</div>
-        <div className="col-span-1">{t("node.mem")}</div>
-        {enableSwap && <div className="col-span-1">{t("node.swap")}</div>}
-        <div className="col-span-1">{t("node.disk")}</div>
-        <div className="col-span-1">{t("node.network")}</div>
-        <div className="col-span-1">{t("node.traffic")}</div>
-        <div className="col-span-1">{t("node.load")}</div>
+    <ScrollArea className="w-full" showHorizontalScrollbar>
+      <div className="min-w-[1080px] px-2 pb-2">
+        <div className="space-y-1">
+          <Card
+            className={`theme-card-style text-primary font-bold grid ${gridCols} text-center gap-4 p-2 items-center transition-colors duration-200`}>
+            <div className="col-span-2">{t("node.name")}</div>
+            <div className="col-span-1">{t("node.cpu")}</div>
+            <div className="col-span-1">{t("node.mem")}</div>
+            {enableSwap && <div className="col-span-1">{t("node.swap")}</div>}
+            <div className="col-span-1">{t("node.disk")}</div>
+            <div className="col-span-1">{t("node.network")}</div>
+            <div className="col-span-1">{t("node.traffic")}</div>
+            <div className="col-span-1">{t("node.load")}</div>
+          </Card>
+          {nodes.map((node) => (
+            <NodeTableRow
+              key={node.uuid}
+              node={node}
+              enableSwap={enableSwap}
+              enableListItemProgressBar={enableListItemProgressBar}
+              selectTrafficProgressStyle={selectTrafficProgressStyle}
+            />
+          ))}
+        </div>
       </div>
-      {nodes.map((node) => (
-        <NodeTableRow
-          key={node.uuid}
-          node={node}
-          enableSwap={enableSwap}
-          enableListItemProgressBar={enableListItemProgressBar}
-          selectTrafficProgressStyle={selectTrafficProgressStyle}
-        />
-      ))}
-    </div>
+    </ScrollArea>
   );
 };
 
@@ -99,10 +105,10 @@ const NodeTableRow = ({
   const { t } = useLocale();
 
   return (
-    <>
+    <Card>
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className={`grid ${gridCols} text-center shadow-sm shadow-(color:--accent-4)/50 gap-4 p-2 text-nowrap items-center rounded-lg ${
+        className={`grid ${gridCols} text-center gap-4 p-2 text-nowrap items-center ${
           isOnline
             ? ""
             : "striped-bg-red-translucent-diagonal ring-2 ring-red-500/50"
@@ -316,8 +322,10 @@ const NodeTableRow = ({
         </div>
       </div>
       <div
-        className={`transition-all duration-300 ease-in-out overflow-hidden ${
-          isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+        className={`transition-all duration-300 ease-in-out ${
+          isOpen
+            ? "max-h-[1000px] opacity-100"
+            : "max-h-0 opacity-0 overflow-hidden"
         }`}
         onTransitionEnd={() => {
           if (!isOpen) {
@@ -335,6 +343,6 @@ const NodeTableRow = ({
           </div>
         </div>
       </div>
-    </>
+    </Card>
   );
 };

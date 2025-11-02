@@ -30,6 +30,7 @@ import { useLocale } from "@/config/hooks";
 import { StatsBar } from "../sections/StatsBar";
 import type { StatsBarProps } from "../sections/StatsBar";
 import EditButton from "../settings/EditButton";
+import { Card } from "../ui/card";
 
 interface HeaderProps extends Partial<StatsBarProps> {
   isPrivate?: boolean;
@@ -38,10 +39,247 @@ interface HeaderProps extends Partial<StatsBarProps> {
   setIsSettingsOpen?: (isOpen: boolean) => void;
 }
 
+const ViewModeIcons = {
+  grid: Grid3X3,
+  compact: Rows3,
+  table: Table2,
+};
+
+const ThemeIcons = {
+  light: Sun,
+  dark: Moon,
+  system: SunMoon,
+};
+
+const ViewMenuItems = ({
+  setViewMode,
+}: {
+  setViewMode: (mode: "grid" | "compact" | "table") => void;
+}) => {
+  const { t } = useLocale();
+  return (
+    <>
+      <DropdownMenuItem onClick={() => setViewMode("grid")}>
+        <Grid3X3 className="size-4 mr-2 text-primary" />
+        <span>{t("header.grid")}</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => setViewMode("compact")}>
+        <Rows3 className="size-4 mr-2 text-primary" />
+        <span>{t("header.compact")}</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => setViewMode("table")}>
+        <Table2 className="size-4 mr-2 text-primary" />
+        <span>{t("header.table")}</span>
+      </DropdownMenuItem>
+    </>
+  );
+};
+
+const ThemeMenuItems = ({
+  setAppearance,
+}: {
+  setAppearance: (appearance: "light" | "dark" | "system") => void;
+}) => {
+  const { t } = useLocale();
+  return (
+    <>
+      <DropdownMenuItem onClick={() => setAppearance("light")}>
+        <Sun className="size-4 mr-2 text-primary" />
+        <span>{t("header.lightMode")}</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => setAppearance("dark")}>
+        <Moon className="size-4 mr-2 text-primary" />
+        <span>{t("header.darkMode")}</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => setAppearance("system")}>
+        <SunMoon className="size-4 mr-2 text-primary" />
+        <span>{t("header.systemMode")}</span>
+      </DropdownMenuItem>
+    </>
+  );
+};
+
+const ViewModeSwitcher = ({ isMobile }: { isMobile?: boolean }) => {
+  const { viewMode, setViewMode } = useTheme();
+  const { t } = useLocale();
+  const Icon = ViewModeIcons[viewMode];
+
+  if (isMobile) {
+    return (
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger>
+          <Icon className="size-4 mr-2 text-primary" />
+          <span>{t("header.toggleView")}</span>
+        </DropdownMenuSubTrigger>
+        <DropdownMenuSubContent className="purcarte-blur border-(--accent-4)/50 rounded-xl">
+          <ViewMenuItems setViewMode={setViewMode} />
+        </DropdownMenuSubContent>
+      </DropdownMenuSub>
+    );
+  }
+
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Icon className="size-5 text-primary" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        className="purcarte-blur mt-[.5rem] border-(--accent-4)/50 rounded-xl">
+        <ViewMenuItems setViewMode={setViewMode} />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+const ThemeSwitcher = ({ isMobile }: { isMobile?: boolean }) => {
+  const { rawAppearance, setAppearance } = useTheme();
+  const { t } = useLocale();
+  const Icon = ThemeIcons[rawAppearance];
+
+  if (isMobile) {
+    return (
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger>
+          <Icon className="size-4 mr-2 text-primary" />
+          <span>{t("header.toggleTheme")}</span>
+        </DropdownMenuSubTrigger>
+        <DropdownMenuSubContent className="purcarte-blur border-(--accent-4)/50 rounded-xl">
+          <ThemeMenuItems setAppearance={setAppearance} />
+        </DropdownMenuSubContent>
+      </DropdownMenuSub>
+    );
+  }
+
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Icon className="size-5 text-primary" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        className="purcarte-blur mt-[.5rem] border-(--accent-4)/50 rounded-xl">
+        <ThemeMenuItems setAppearance={setAppearance} />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+const AdminButton = ({ isMobile }: { isMobile?: boolean }) => {
+  const { t } = useLocale();
+  const { enableAdminButton } = useAppConfig();
+
+  if (!enableAdminButton) return null;
+
+  if (isMobile) {
+    return (
+      <DropdownMenuItem asChild>
+        <a
+          href="/admin"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center">
+          <CircleUserIcon className="size-4 mr-2 text-primary" />
+          <span>{t("header.admin")}</span>
+        </a>
+      </DropdownMenuItem>
+    );
+  }
+
+  return (
+    <a href="/admin" target="_blank" rel="noopener noreferrer">
+      <Button variant="ghost" size="icon">
+        <CircleUserIcon className="size-5 text-primary" />
+      </Button>
+    </a>
+  );
+};
+
+const SearchBar = ({
+  isMobile,
+  searchTerm,
+  setSearchTerm,
+}: {
+  isMobile?: boolean;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
+}) => {
+  const { t } = useLocale();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { enableSearchButton } = useAppConfig();
+
+  if (!enableSearchButton || searchTerm === undefined || !setSearchTerm) {
+    return null;
+  }
+
+  if (isMobile) {
+    return (
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="relative group">
+            <Search className="size-5 text-primary" />
+            {searchTerm && (
+              <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-(--accent-indicator) transform -translate-x-1/2"></span>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          className="purcarte-blur border-(--accent-4)/50 rounded-xl w-[90vw] translate-x-[5vw] mt-[.5rem] max-w-screen-2xl">
+          <div className="p-2">
+            <Input
+              type="search"
+              placeholder={t("search.placeholder")}
+              className="w-full"
+              value={searchTerm}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchTerm(e.target.value)
+              }
+            />
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  return (
+    <>
+      <div
+        className={`flex items-center transition-all duration-300 ease-in-out overflow-hidden transform ${
+          isSearchOpen ? "w-48 opacity-100" : "w-0 opacity-0"
+        }`}>
+        <Input
+          type="search"
+          placeholder={t("search.placeholder")}
+          className={`transition-all duration-300 ease-in-out ${
+            !isSearchOpen && "invisible"
+          }`}
+          value={searchTerm}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchTerm(e.target.value)
+          }
+        />
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="relative group"
+        onClick={() => setIsSearchOpen(!isSearchOpen)}>
+        <Search className="size-5 text-primary" />
+        {searchTerm && (
+          <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-(--accent-indicator) transform -translate-x-1/2"></span>
+        )}
+      </Button>
+    </>
+  );
+};
+
 export const Header = (props: HeaderProps) => {
   const { isPrivate, searchTerm, setSearchTerm, setIsSettingsOpen } = props;
-  const { rawAppearance, setAppearance, viewMode, setViewMode } = useTheme();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
   const isInstancePage = location.pathname.startsWith("/instance");
   const {
@@ -49,14 +287,11 @@ export const Header = (props: HeaderProps) => {
     titleText,
     enableLogo,
     logoUrl,
-    enableSearchButton,
-    enableAdminButton,
     isShowStatsInHeader,
     siteStatus,
     isShowConfigEditButtonInLogined,
   } = useAppConfig();
   const isMobile = useIsMobile();
-  const { t } = useLocale();
 
   useEffect(() => {
     if (titleText) {
@@ -65,8 +300,8 @@ export const Header = (props: HeaderProps) => {
   }, [titleText]);
 
   return (
-    <>
-      <header className="purcarte-blur border-b border-(--accent-a4) shadow-sm shadow-(color:--accent-a4) sticky top-0 flex items-center justify-center z-10">
+    <header className="sticky top-0 left-0 right-0 flex z-10">
+      <Card className="rounded-none w-full flex items-center justify-center">
         <div className="w-(--main-width) max-w-screen-2xl py-2 flex items-center justify-between">
           <div className="flex items-center theme-text-shadow text-accent-foreground">
             <a href="/" className="flex items-center gap-2 text-2xl font-bold">
@@ -76,6 +311,7 @@ export const Header = (props: HeaderProps) => {
               {enableTitle && <span>{titleText}</span>}
             </a>
           </div>
+
           {!isInstancePage &&
             isShowStatsInHeader &&
             !isMobile &&
@@ -84,346 +320,52 @@ export const Header = (props: HeaderProps) => {
                 <StatsBar {...(props as Required<StatsBarProps>)} />
               </div>
             )}
+
           <div className="flex items-center space-x-2">
-            {!isInstancePage && (
+            {isMobile ? (
               <>
-                {isMobile ? (
+                {!isInstancePage && (
+                  <SearchBar
+                    isMobile
+                    searchTerm={searchTerm!}
+                    setSearchTerm={setSearchTerm!}
+                  />
+                )}
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="relative group">
+                      <Menu className="size-5 text-primary transition-transform duration-300 group-data-[state=open]:rotate-180" />
+                      <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-(--accent-indicator) transform -translate-x-1/2 scale-0 transition-transform duration-300 group-data-[state=open]:scale-100"></span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="purcarte-blur mt-[.5rem] border-(--accent-4)/50 rounded-xl">
+                    {!isInstancePage && <ViewModeSwitcher isMobile />}
+                    <ThemeSwitcher isMobile />
+                    <AdminButton isMobile />
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                {!isInstancePage && (
                   <>
-                    {enableSearchButton &&
-                      searchTerm != undefined &&
-                      setSearchTerm && (
-                        <DropdownMenu modal={false}>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="relative group">
-                              <Search className="size-5 text-primary" />
-                              {searchTerm && (
-                                <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-(--accent-indicator) transform -translate-x-1/2"></span>
-                              )}
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className="purcarte-blur border-(--accent-4)/50 rounded-xl w-[90vw] translate-x-[5vw] mt-[.5rem] max-w-screen-2xl">
-                            <div className="p-2">
-                              <Input
-                                type="search"
-                                placeholder={t("search.placeholder")}
-                                className="w-full"
-                                value={searchTerm}
-                                onChange={(
-                                  e: React.ChangeEvent<HTMLInputElement>
-                                ) => setSearchTerm(e.target.value)}
-                              />
-                            </div>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                    <DropdownMenu modal={false}>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="relative group">
-                          <Menu className="size-5 text-primary transition-transform duration-300 group-data-[state=open]:rotate-180" />
-                          <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-(--accent-indicator) transform -translate-x-1/2 scale-0 transition-transform duration-300 group-data-[state=open]:scale-100"></span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="purcarte-blur mt-[.5rem] border-(--accent-4)/50 rounded-xl">
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>
-                            {viewMode === "grid" ? (
-                              <Grid3X3 className="size-4 mr-2 text-primary" />
-                            ) : viewMode === "compact" ? (
-                              <Rows3 className="size-4 mr-2 text-primary" />
-                            ) : (
-                              <Table2 className="size-4 mr-2 text-primary" />
-                            )}
-                            <span>{t("header.toggleView")}</span>
-                          </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="purcarte-blur border-(--accent-4)/50 rounded-xl">
-                            <DropdownMenuItem
-                              onClick={() => setViewMode("grid")}>
-                              <Grid3X3 className="size-4 mr-2 text-primary" />
-                              <span>{t("header.grid")}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => setViewMode("compact")}>
-                              <Rows3 className="size-4 mr-2 text-primary" />
-                              <span>{t("header.compact")}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => setViewMode("table")}>
-                              <Table2 className="size-4 mr-2 text-primary" />
-                              <span>{t("header.table")}</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>
-                            {rawAppearance === "light" ? (
-                              <Sun className="size-4 mr-2 text-primary" />
-                            ) : rawAppearance === "dark" ? (
-                              <Moon className="size-4 mr-2 text-primary" />
-                            ) : (
-                              <SunMoon className="size-4 mr-2 text-primary" />
-                            )}
-                            <span>{t("header.toggleTheme")}</span>
-                          </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent className="purcarte-blur border-(--accent-4)/50 rounded-xl">
-                            <DropdownMenuItem
-                              onClick={() => setAppearance("light")}>
-                              <Sun className="size-4 mr-2 text-primary" />
-                              <span>{t("header.lightMode")}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => setAppearance("dark")}>
-                              <Moon className="size-4 mr-2 text-primary" />
-                              <span>{t("header.darkMode")}</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => setAppearance("system")}>
-                              <SunMoon className="size-4 mr-2 text-primary" />
-                              <span>{t("header.systemMode")}</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-                        {enableAdminButton && (
-                          <DropdownMenuItem asChild>
-                            <a
-                              href="/admin"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center">
-                              <CircleUserIcon className="size-4 mr-2 text-primary" />
-                              <span>{t("header.admin")}</span>
-                            </a>
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </>
-                ) : (
-                  <>
-                    {enableSearchButton &&
-                      searchTerm != undefined &&
-                      setSearchTerm && (
-                        <>
-                          <div
-                            className={`flex items-center transition-all duration-300 ease-in-out overflow-hidden transform ${
-                              isSearchOpen
-                                ? "w-48 opacity-100"
-                                : "w-0 opacity-0"
-                            }`}>
-                            <Input
-                              type="search"
-                              placeholder={t("search.placeholder")}
-                              className={`transition-all duration-300 ease-in-out ${
-                                !isSearchOpen && "invisible"
-                              }`}
-                              value={searchTerm}
-                              onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
-                              ) => setSearchTerm(e.target.value)}
-                            />
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="relative group"
-                            onClick={() => setIsSearchOpen(!isSearchOpen)}>
-                            <Search className="size-5 text-primary" />
-                            {searchTerm && (
-                              <span className="absolute top-0 right-0 w-1.5 h-1.5 rounded-full bg-(--accent-indicator) transform -translate-x-1/2"></span>
-                            )}
-                          </Button>
-                        </>
-                      )}
-                    <DropdownMenu modal={false}>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          {viewMode === "grid" ? (
-                            <Grid3X3 className="size-5 text-primary" />
-                          ) : viewMode === "compact" ? (
-                            <Rows3 className="size-5 text-primary" />
-                          ) : (
-                            <Table2 className="size-5 text-primary" />
-                          )}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="purcarte-blur mt-[.5rem] border-(--accent-4)/50 rounded-xl">
-                        <DropdownMenuItem onClick={() => setViewMode("grid")}>
-                          <Grid3X3 className="size-4 mr-2 text-primary" />
-                          <span>{t("header.grid")}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => setViewMode("compact")}>
-                          <Rows3 className="size-4 mr-2 text-primary" />
-                          <span>{t("header.compact")}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setViewMode("table")}>
-                          <Table2 className="size-4 mr-2 text-primary" />
-                          <span>{t("header.table")}</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <DropdownMenu modal={false}>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          {rawAppearance === "light" ? (
-                            <Sun className="size-5 text-primary" />
-                          ) : rawAppearance === "dark" ? (
-                            <Moon className="size-5 text-primary" />
-                          ) : (
-                            <SunMoon className="size-5 text-primary" />
-                          )}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="purcarte-blur mt-[.5rem] border-(--accent-4)/50 rounded-xl">
-                        <DropdownMenuItem
-                          onClick={() => setAppearance("light")}>
-                          <Sun className="size-4 mr-2 text-primary" />
-                          <span>{t("header.lightMode")}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setAppearance("dark")}>
-                          <Moon className="size-4 mr-2 text-primary" />
-                          <span>{t("header.darkMode")}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => setAppearance("system")}>
-                          <SunMoon className="size-4 mr-2 text-primary" />
-                          <span>{t("header.systemMode")}</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    {enableAdminButton && (
-                      <a
-                        href="/admin"
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon">
-                          <CircleUserIcon className="size-5 text-primary" />
-                        </Button>
-                      </a>
-                    )}
+                    <SearchBar
+                      searchTerm={searchTerm!}
+                      setSearchTerm={setSearchTerm!}
+                    />
+                    <ViewModeSwitcher />
                   </>
                 )}
+                <ThemeSwitcher />
+                <AdminButton />
               </>
             )}
-            {isInstancePage && (
-              <>
-                {isMobile ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="relative group">
-                        <Menu className="size-5 text-primary transition-transform duration-300 group-data-[state=open]:rotate-180" />
-                        <span className="absolute -bottom-1 left-1/2 w-1.5 h-1.5 rounded-full bg-primary transform -translate-x-1/2 scale-0 transition-transform duration-300 group-data-[state=open]:scale-100"></span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="animate-in slide-in-from-top-5 duration-300 purcarte-blur border-(--accent-4)/50 rounded-xl">
-                      <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                          {rawAppearance === "light" ? (
-                            <Sun className="size-4 mr-2 text-primary" />
-                          ) : rawAppearance === "dark" ? (
-                            <Moon className="size-4 mr-2 text-primary" />
-                          ) : (
-                            <SunMoon className="size-4 mr-2 text-primary" />
-                          )}
-                          <span>{t("header.toggleTheme")}</span>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent className="purcarte-blur border-(--accent-4)/50 rounded-xl">
-                          <DropdownMenuItem
-                            onClick={() => setAppearance("light")}>
-                            <Sun className="size-4 mr-2 text-primary" />
-                            <span>{t("header.lightMode")}</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => setAppearance("dark")}>
-                            <Moon className="size-4 mr-2 text-primary" />
-                            <span>{t("header.darkMode")}</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => setAppearance("system")}>
-                            <SunMoon className="size-4 mr-2 text-primary" />
-                            <span>{t("header.systemMode")}</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuSub>
-                      {enableAdminButton && (
-                        <DropdownMenuItem asChild>
-                          <a
-                            href="/admin"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center">
-                            <CircleUserIcon className="size-4 mr-2 text-primary" />
-                            <span>{t("header.admin")}</span>
-                          </a>
-                        </DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <>
-                    <DropdownMenu modal={false}>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          {rawAppearance === "light" ? (
-                            <Sun className="size-5 text-primary" />
-                          ) : rawAppearance === "dark" ? (
-                            <Moon className="size-5 text-primary" />
-                          ) : (
-                            <SunMoon className="size-5 text-primary" />
-                          )}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="purcarte-blur mt-[.5rem] border-(--accent-4)/50 rounded-xl">
-                        <DropdownMenuItem
-                          onClick={() => setAppearance("light")}>
-                          <Sun className="size-4 mr-2 text-primary" />
-                          <span>{t("header.lightMode")}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setAppearance("dark")}>
-                          <Moon className="size-4 mr-2 text-primary" />
-                          <span>{t("header.darkMode")}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => setAppearance("system")}>
-                          <SunMoon className="size-4 mr-2 text-primary" />
-                          <span>{t("header.systemMode")}</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    {enableAdminButton && (
-                      <a
-                        href="/admin"
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon">
-                          <CircleUserIcon className="size-5 text-primary" />
-                        </Button>
-                      </a>
-                    )}
-                  </>
-                )}
-              </>
-            )}
+
             {isShowConfigEditButtonInLogined &&
               (siteStatus === "authenticated" ||
                 siteStatus === "private-authenticated") && (
@@ -433,7 +375,7 @@ export const Header = (props: HeaderProps) => {
               )}
           </div>
         </div>
-      </header>
-    </>
+      </Card>
+    </header>
   );
 };

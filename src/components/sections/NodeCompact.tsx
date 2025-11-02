@@ -65,7 +65,7 @@ const NodeDetailModal = ({ node, onClose }: NodeDetailModalProps) => {
         </div>
         <ScrollArea
           className="h-[calc(80vh-100px)]"
-          viewportProps={{ className: "px-2" }}>
+          viewportProps={{ className: "p-2" }}>
           <div className="space-y-4 @container">
             <Instance node={node} />
             <PingChart node={node} hours={pingChartTimeInPreview} />
@@ -128,7 +128,7 @@ export const NodeCompact = ({ node, onShowDetails }: NodeCompactProps) => {
 
   return (
     <Card
-      className={`flex flex-col mx-auto purcarte-blur w-full min-w-[280px] max-w-sm ${
+      className={`flex flex-col mx-auto w-full min-w-[280px] max-w-sm ${
         isOnline
           ? ""
           : "striped-bg-red-translucent-diagonal ring-2 ring-red-500/50"
