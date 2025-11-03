@@ -19,9 +19,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
             "group toast purcarte-blur theme-card-style !text-foreground !text-sm",
           description: "text-secondary-foreground",
           actionButton:
-            "theme-button !text-primary !text-sm inset-shadow-xs inset-shadow-(color:--accent-a4) !mr-0 !ml-0",
+            "theme-button !text-primary !text-sm inset-shadow-xs inset-shadow-(color:--accent-a4)",
           cancelButton:
-            "theme-button-ghost !text-secondary-foreground !text-sm inset-shadow-xs inset-shadow-(color:--accent-a4) !mr-2",
+            "theme-button-ghost !text-secondary-foreground !text-sm inset-shadow-xs inset-shadow-(color:--accent-a4)",
         },
       }}
       {...props}

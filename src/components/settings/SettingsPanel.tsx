@@ -147,10 +147,6 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
     if (hasUnsavedChanges && !toastId.current) {
       toastId.current = toast(texts.unsavedChanges, {
         duration: Infinity,
-        action: {
-          label: texts.save,
-          onClick: () => handleSave(),
-        },
         cancel: {
           label: texts.cancel,
           onClick: () => {
@@ -164,11 +160,9 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
       toastId.current = null;
     }
   }, [
-    handleSave,
     hasUnsavedChanges,
     reloadConfig,
     texts.cancel,
-    texts.save,
     texts.unsavedChanges,
     texts.unsavedChangesDesc,
   ]);
