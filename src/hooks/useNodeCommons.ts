@@ -181,7 +181,7 @@ export const useNodeCommons = (node: NodeData & { stats?: any }) => {
   if (daysLeft !== null) {
     const daysLeftText = t("node.daysLeft", { daysLeft: daysLeft });
     if (daysLeft < 0) {
-      daysLeftTag = `${daysLeftText}<red>`;
+      daysLeftTag = `${t("node.expired")}<red>`;
     } else if (daysLeft <= 7) {
       daysLeftTag = `${daysLeftText}<red>`;
     } else if (daysLeft <= 15) {
