@@ -24,60 +24,60 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
   const [loading, setLoading] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        const { status, publicInfo } = await apiService.checkSiteStatus();
-        setSiteStatus(status);
-        setPublicSettings(publicInfo);
+  const loadConfig = async () => {
+    try {
+      const { status, publicInfo } = await apiService.checkSiteStatus();
+      setSiteStatus(status);
+      setPublicSettings(publicInfo);
 
-        let mergedConfig: ConfigOptions;
-        if (publicInfo) {
-          const themeSettings =
-            (publicInfo.theme_settings as ConfigOptions) || {};
-          mergedConfig = {
-            ...DEFAULT_CONFIG,
-            ...themeSettings,
-            titleText:
-              themeSettings.titleText ||
-              publicInfo.sitename ||
-              DEFAULT_CONFIG.titleText,
-          };
-        } else {
-          mergedConfig = DEFAULT_CONFIG;
-        }
-        setConfig(mergedConfig);
+      let mergedConfig: ConfigOptions;
+      if (publicInfo) {
+        const themeSettings =
+          (publicInfo.theme_settings as ConfigOptions) || {};
+        mergedConfig = {
+          ...DEFAULT_CONFIG,
+          ...themeSettings,
+          titleText:
+            themeSettings.titleText ||
+            publicInfo.sitename ||
+            DEFAULT_CONFIG.titleText,
+        };
+      } else {
+        mergedConfig = DEFAULT_CONFIG;
+      }
+      setConfig(mergedConfig);
 
-        // Initialize RPC
-        if (mergedConfig.enableJsonRPC2Api) {
-          const versionInfo = await apiService.getVersion();
-          if (versionInfo && versionInfo.version) {
-            const match = versionInfo.version.match(/(\d+)\.(\d+)\.(\d+)/);
-            if (match) {
-              const [, major, minor, patch] = match.map(Number);
-              if (
-                major > 1 ||
-                (major === 1 && minor > 0) ||
-                (major === 1 && minor === 0 && patch >= 7)
-              ) {
-                apiService.useRpc = true;
-                getWsService().useRpc = true;
-                console.log("RPC has been enabled for API and WebSocket.");
-              }
+      // Initialize RPC
+      if (mergedConfig.enableJsonRPC2Api) {
+        const versionInfo = await apiService.getVersion();
+        if (versionInfo && versionInfo.version) {
+          const match = versionInfo.version.match(/(\d+)\.(\d+)\.(\d+)/);
+          if (match) {
+            const [, major, minor, patch] = match.map(Number);
+            if (
+              major > 1 ||
+              (major === 1 && minor > 0) ||
+              (major === 1 && minor === 0 && patch >= 7)
+            ) {
+              apiService.useRpc = true;
+              getWsService().useRpc = true;
+              console.log("RPC has been enabled for API and WebSocket.");
             }
           }
         }
-      } catch (error) {
-        console.error("Failed to initialize site:", error);
-        setConfig(DEFAULT_CONFIG);
-        setSiteStatus("private-unauthenticated");
-      } finally {
-        setLoading(false);
-        setTimeout(() => setIsLoaded(true), 300);
       }
-    };
+    } catch (error) {
+      console.error("Failed to initialize site:", error);
+      setConfig(DEFAULT_CONFIG);
+      setSiteStatus("private-unauthenticated");
+    } finally {
+      setLoading(false);
+      setTimeout(() => setIsLoaded(true), 300);
+    }
+  };
 
-    initialize();
+  useEffect(() => {
+    loadConfig();
   }, []);
 
   const texts = useMemo(() => {
@@ -92,6 +92,11 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
 
   const updatePreviewConfig = (newConfig: Partial<ConfigOptions>) => {
     setPreviewConfig(newConfig);
+  };
+
+  const reloadConfig = async () => {
+    setLoading(true);
+    await loadConfig();
   };
 
   const activeConfig = useMemo(
@@ -118,6 +123,7 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
         texts,
         previewConfig,
         updatePreviewConfig,
+        reloadConfig,
       }}>
       {children}
     </ConfigContext.Provider>

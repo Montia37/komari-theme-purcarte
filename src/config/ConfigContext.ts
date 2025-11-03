@@ -10,6 +10,7 @@ export interface ConfigContextType extends ConfigOptions {
   texts: typeof defaultTexts;
   previewConfig: Partial<ConfigOptions> | null;
   updatePreviewConfig: (newConfig: Partial<ConfigOptions>) => void;
+  reloadConfig: () => Promise<void>;
 }
 
 // 创建配置上下文
@@ -20,4 +21,5 @@ export const ConfigContext = createContext<ConfigContextType>({
   texts: defaultTexts,
   previewConfig: null,
   updatePreviewConfig: () => {},
+  reloadConfig: async () => {},
 });

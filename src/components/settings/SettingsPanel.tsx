@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useAppConfig } from "@/config/hooks";
 import type { ConfigOptions } from "@/config/default";
 import { DEFAULT_CONFIG } from "@/config/default";
@@ -7,6 +7,7 @@ import SettingItem from "./SettingItem";
 import CustomTextsEditor from "./CustomTextsEditor";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/useMobile";
+import { toast } from "sonner";
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -14,8 +15,35 @@ interface SettingsPanelProps {
 }
 
 const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
+  const texts = {
+    title: "编辑配置",
+    customUI: "UI 自定义",
+    close: "关闭",
+    import: "导入",
+    export: "导出",
+    togglePreview: {
+      on: "关闭预览",
+      off: "开启预览",
+    },
+    reset: "重置",
+    save: "保存",
+    back: "返回",
+    unsavedChanges: "有未保存的更改",
+    unsavedChangesDesc: "配置已恢复到上次保存的状态",
+    saveSuccess: "配置已保存！",
+    saveError: "保存配置失败！",
+    resetConfirm: "确定要重置所有配置吗？",
+    resetConfirmAction: "确定",
+    importSuccess: "导入成功，是否立即保存？",
+    importError: "导入配置失败！",
+    fetchError: "Failed to fetch theme settings config:",
+    saveThemeError: "Failed to save theme settings:",
+    importConfigError: "Failed to import config:",
+    cancel: "撤销",
+  };
+
   const config = useAppConfig();
-  const { publicSettings, updatePreviewConfig } = config;
+  const { publicSettings, updatePreviewConfig, reloadConfig } = config;
   const [settingsConfig, setSettingsConfig] = useState<any[]>([]);
   const [editingConfig, setEditingConfig] = useState<Partial<ConfigOptions>>(
     {}
@@ -24,6 +52,8 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   const [customTextsPage, setCustomTextsPage] = useState("main");
   const [isPreviewing, setIsPreviewing] = useState(true);
   const isMobile = useIsMobile();
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const toastId = useRef<string | number | null>(null);
 
   useEffect(() => {
     const fetchSettingsConfig = async () => {
@@ -35,13 +65,13 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
           const data = await response.json();
           setSettingsConfig(data.configuration.data);
         } catch (error) {
-          console.error("Failed to fetch theme settings config:", error);
+          console.error(texts.fetchError, error);
         }
       }
     };
 
     fetchSettingsConfig();
-  }, [publicSettings?.theme]);
+  }, [publicSettings?.theme, texts.fetchError]);
 
   useEffect(() => {
     setEditingConfig(publicSettings?.theme_settings || {});
@@ -49,7 +79,19 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
 
   useEffect(() => {
     updatePreviewConfig(editingConfig);
-  }, [editingConfig, updatePreviewConfig]);
+    const hasChanges =
+      JSON.stringify(editingConfig) !==
+      JSON.stringify(publicSettings?.theme_settings || {});
+    setHasUnsavedChanges(hasChanges);
+  }, [editingConfig, publicSettings?.theme_settings, updatePreviewConfig]);
+
+  useEffect(() => {
+    return () => {
+      if (toastId.current) {
+        toast.dismiss(toastId.current);
+      }
+    };
+  }, []);
 
   const handleConfigChange = (key: keyof ConfigOptions, value: any) => {
     const newConfig = { ...editingConfig, [key]: value };
@@ -59,26 +101,77 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     try {
       await apiService.saveThemeSettings(
         publicSettings?.theme || "",
         editingConfig
       );
-      alert("配置已保存！");
+      toast.success(texts.saveSuccess);
+      if (toastId.current) {
+        toast.dismiss(toastId.current);
+        toastId.current = null;
+      }
+      await reloadConfig();
       onClose();
-      window.location.reload();
     } catch (error) {
-      console.error("Failed to save theme settings:", error);
-      alert("保存配置失败！");
+      console.error(texts.saveThemeError, error);
+      toast.error(texts.saveError);
     }
-  };
+  }, [
+    editingConfig,
+    onClose,
+    publicSettings,
+    reloadConfig,
+    texts.saveError,
+    texts.saveSuccess,
+    texts.saveThemeError,
+  ]);
 
   const handleReset = () => {
-    if (window.confirm("确定要重置所有配置吗？")) {
-      setEditingConfig(DEFAULT_CONFIG);
-    }
+    toast(texts.resetConfirm, {
+      action: {
+        label: texts.resetConfirmAction,
+        onClick: () => {
+          setEditingConfig(DEFAULT_CONFIG);
+          if (toastId.current) {
+            toast.dismiss(toastId.current);
+            toastId.current = null;
+          }
+        },
+      },
+    });
   };
+
+  useEffect(() => {
+    if (hasUnsavedChanges && !toastId.current) {
+      toastId.current = toast(texts.unsavedChanges, {
+        duration: Infinity,
+        action: {
+          label: texts.save,
+          onClick: () => handleSave(),
+        },
+        cancel: {
+          label: texts.cancel,
+          onClick: () => {
+            reloadConfig();
+            toast.success(texts.unsavedChangesDesc);
+          },
+        },
+      });
+    } else if (!hasUnsavedChanges && toastId.current) {
+      toast.dismiss(toastId.current);
+      toastId.current = null;
+    }
+  }, [
+    handleSave,
+    hasUnsavedChanges,
+    reloadConfig,
+    texts.cancel,
+    texts.save,
+    texts.unsavedChanges,
+    texts.unsavedChangesDesc,
+  ]);
 
   const handlePreviewToggle = () => {
     if (isPreviewing) {
@@ -116,12 +209,15 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
             }
           }
           setEditingConfig(sanitizedConfig);
-          if (window.confirm("导入成功，是否立即保存？")) {
-            handleSave();
-          }
+          toast.success(texts.importSuccess, {
+            action: {
+              label: texts.save,
+              onClick: () => setTimeout(() => handleSave(), 300),
+            },
+          });
         } catch (error) {
-          console.error("Failed to import config:", error);
-          alert("导入配置失败！");
+          console.error(texts.importConfigError, error);
+          toast.error(texts.importError);
         }
       };
       reader.readAsText(file);
@@ -130,14 +226,14 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
 
   const panelClasses = isMobile
     ? "fixed bottom-0 left-0 w-full h-3/4 bg-gray-100/90 dark:bg-gray-900/90 theme-card-style shadow-lg z-50 p-4 overflow-y-auto transform transition-transform duration-300 ease-in-out"
-    : "h-screen w-80 bg-gray-100/90 dark:bg-gray-900/90 heme-card-style shadow-lg p-4 overflow-y-auto flex-shrink-0";
+    : "h-screen w-80 bg-gray-100/90 dark:bg-gray-900/90 theme-card-style shadow-lg p-4 overflow-y-auto flex-shrink-0";
 
   if (!isOpen) return null;
 
   return (
     <div className={panelClasses}>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">编辑配置</h2>
+        <h2 className="text-xl font-bold">{texts.title}</h2>
         <Button
           onClick={() => {
             if (isPreviewing) {
@@ -146,13 +242,13 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
             onClose();
           }}
           variant="ghost">
-          关闭
+          {texts.close}
         </Button>
       </div>
       <div className="flex flex-wrap gap-2 mb-4">
         <Button asChild>
           <label htmlFor="import-config">
-            导入
+            {texts.import}
             <input
               id="import-config"
               type="file"
@@ -162,15 +258,13 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
             />
           </label>
         </Button>
-        <Button onClick={handleExport}>导出</Button>
+        <Button onClick={handleExport}>{texts.export}</Button>
         <Button onClick={handlePreviewToggle}>
-          {isPreviewing ? "关闭预览" : "开启预览"}
+          {isPreviewing ? texts.togglePreview.on : texts.togglePreview.off}
         </Button>
-        <Button onClick={handleReset} variant="destructive">
-          重置
-        </Button>
+        <Button onClick={handleReset}>{texts.reset}</Button>
         <Button onClick={handleSave} className="bg-green-500">
-          保存
+          {texts.save}
         </Button>
       </div>
       <div className="space-y-4">
@@ -187,10 +281,10 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
             ))
         ) : (
           <>
-            {currentPage === "UI 自定义" &&
+            {currentPage === texts.customUI &&
             customTextsPage !== "main" ? null : (
               <Button onClick={() => setCurrentPage("main")} className="mb-4">
-                返回
+                {texts.back}
               </Button>
             )}
             {settingsConfig

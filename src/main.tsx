@@ -24,6 +24,7 @@ import { useNodeListCommons } from "@/hooks/useNodeCommons";
 import SettingsPanel from "./components/settings/SettingsPanel";
 import { useIsMobile } from "./hooks/useMobile";
 import type { SiteStatus } from "./config/default";
+import { Toaster } from "@/components/ui/sonner";
 const HomePage = lazy(() => import("@/pages/Home"));
 const InstancePage = lazy(() => import("@/pages/instance"));
 const NotFoundPage = lazy(() => import("@/pages/NotFound"));
@@ -36,6 +37,7 @@ const homeScrollState = {
 const AppRoutes = ({
   searchTerm,
   setSearchTerm,
+  isSettingsOpen,
   setIsSettingsOpen,
   headerRef,
   headerHeight,
@@ -43,6 +45,7 @@ const AppRoutes = ({
 }: {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
+  isSettingsOpen: boolean;
   setIsSettingsOpen: (isOpen: boolean) => void;
   headerRef: React.RefObject<HTMLElement | null>;
   headerHeight: number;
@@ -109,6 +112,7 @@ const AppRoutes = ({
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         setIsSettingsOpen={setIsSettingsOpen}
+        isSettingsOpen={isSettingsOpen}
         {...statsBarProps}
       />
       <div className="flex-1 min-h-0">
@@ -146,10 +150,7 @@ const AppRoutes = ({
                       />
                     </main>
                     {selectedFooterStyle === "followContent" && (
-                      <Footer
-                        className="w-(--main-width) max-w-screen-2xl mx-auto"
-                        ref={null}
-                      />
+                      <Footer isSettingsOpen={isSettingsOpen} ref={null} />
                     )}
                   </div>
                 </ScrollArea>
@@ -177,10 +178,7 @@ const AppRoutes = ({
                       <InstancePage />
                     </main>
                     {selectedFooterStyle === "followContent" && (
-                      <Footer
-                        className="w-(--main-width) max-w-screen-2xl mx-auto"
-                        ref={null}
-                      />
+                      <Footer isSettingsOpen={isSettingsOpen} ref={null} />
                     )}
                   </div>
                 </ScrollArea>
@@ -194,10 +192,7 @@ const AppRoutes = ({
                     <NotFoundPage />
                   </main>
                   {selectedFooterStyle === "followContent" && (
-                    <Footer
-                      className="w-(--main-width) max-w-screen-2xl mx-auto"
-                      ref={null}
-                    />
+                    <Footer isSettingsOpen={isSettingsOpen} ref={null} />
                   )}
                 </div>
               }
@@ -270,6 +265,7 @@ export const AppContent = () => {
       accentColor={color}
       scaling="110%"
       style={{ backgroundColor: "transparent" }}>
+      <Toaster />
       <DynamicContent>
         <div
           className={`grid h-dvh transition-all duration-300 ${
@@ -290,10 +286,7 @@ export const AppContent = () => {
                       <PrivatePage />
                     </main>
                     {selectedFooterStyle === "followContent" && (
-                      <Footer
-                        className="w-(--main-width) max-w-screen-2xl mx-auto"
-                        ref={null}
-                      />
+                      <Footer isSettingsOpen={isSettingsOpen} ref={null} />
                     )}
                   </div>
                 </Suspense>
@@ -302,6 +295,7 @@ export const AppContent = () => {
               <AppRoutes
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
+                isSettingsOpen={isSettingsOpen}
                 setIsSettingsOpen={setIsSettingsOpen}
                 headerRef={headerRef}
                 headerHeight={headerHeight}
@@ -309,7 +303,9 @@ export const AppContent = () => {
               />
             )}
             {selectedFooterStyle !== "followContent" &&
-              selectedFooterStyle !== "hidden" && <Footer ref={footerRef} />}
+              selectedFooterStyle !== "hidden" && (
+                <Footer ref={footerRef} isSettingsOpen={isSettingsOpen} />
+              )}
           </div>
           <SettingsPanel
             isOpen={isSettingsOpen}

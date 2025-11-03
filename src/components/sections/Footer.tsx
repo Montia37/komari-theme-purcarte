@@ -2,15 +2,17 @@ import { forwardRef } from "react";
 import { useAppConfig, useLocale } from "@/config/hooks";
 import { Card } from "../ui/card";
 import { cn } from "@/utils";
+import { useIsMobile } from "@/hooks/useMobile";
 
 const Footer = forwardRef<
   HTMLElement,
   {
-    className?: string;
+    isSettingsOpen: boolean;
   }
->(({ className }, ref) => {
+>(({ isSettingsOpen }, ref) => {
   const { t } = useLocale();
   const { selectedFooterStyle } = useAppConfig();
+  const isMobile = useIsMobile();
   return (
     <footer
       ref={ref}
@@ -18,11 +20,11 @@ const Footer = forwardRef<
         selectedFooterStyle === "levitation"
           ? "fixed"
           : selectedFooterStyle === "followContent"
-          ? "mb-4"
+          ? "mb-4 w-(--main-width) max-w-screen-2xl mx-auto"
           : "",
-        "bottom-0 left-0 right-0 flex z-10",
-        className
-      )}>
+        "bottom-0 left-0 right-0 flex z-10"
+      )}
+      style={{ right: isSettingsOpen && !isMobile ? "20rem" : "0" }}>
       <Card
         className={cn(
           selectedFooterStyle !== "followContent" ? "rounded-none" : "",

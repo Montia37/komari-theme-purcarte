@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown } from "lucide-react";
+import { Theme } from "@radix-ui/themes";
 import { cn } from "@/utils";
 
 const Select = SelectPrimitive.Root;
@@ -33,24 +34,26 @@ const SelectContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
 >(({ className, children, position = "popper", ...props }, ref) => (
   <SelectPrimitive.Portal>
-    <SelectPrimitive.Content
-      ref={ref}
-      className={cn(
-        "relative z-50 min-w-[8rem] purcarte-blur theme-card-style text-popover-foreground animate-in fade-in-80",
-        position === "popper" && "translate-y-1",
-        className
-      )}
-      position={position}
-      {...props}>
-      <SelectPrimitive.Viewport
+    <Theme>
+      <SelectPrimitive.Content
+        ref={ref}
         className={cn(
-          "p-1 max-h-96 overflow-y-auto",
-          position === "popper" &&
-            "w-full min-w-[var(--radix-select-trigger-width)]"
-        )}>
-        {children}
-      </SelectPrimitive.Viewport>
-    </SelectPrimitive.Content>
+          "relative z-50 min-w-[8rem] purcarte-blur theme-card-style text-popover-foreground animate-in fade-in-80",
+          position === "popper" && "translate-y-1",
+          className
+        )}
+        position={position}
+        {...props}>
+        <SelectPrimitive.Viewport
+          className={cn(
+            "p-1 max-h-96 overflow-y-auto",
+            position === "popper" &&
+              "w-full min-w-[var(--radix-select-trigger-width)]"
+          )}>
+          {children}
+        </SelectPrimitive.Viewport>
+      </SelectPrimitive.Content>
+    </Theme>
   </SelectPrimitive.Portal>
 ));
 SelectContent.displayName = SelectPrimitive.Content.displayName;
