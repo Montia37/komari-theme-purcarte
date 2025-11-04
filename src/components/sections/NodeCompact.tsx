@@ -95,11 +95,7 @@ export const NodeCompactContainer = ({ nodes }: NodeCompactContainerProps) => {
 
   return (
     <>
-      <div
-        className="grid gap-4"
-        style={{
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-        }}>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-4">
         {nodes.map((node) => (
           <NodeCompact
             key={node.uuid}
