@@ -10,7 +10,7 @@ type LoadingProps = {
 const Loading = ({ text, children, size, className }: LoadingProps) => {
   return (
     <div
-      className={`flex items-center justify-center flex-col ${
+      className={`flex items-center justify-center flex-col w-full h-full ${
         className || ""
       }`}>
       <div className={`showbox scale-${size ? size * 10 : 50}`}>

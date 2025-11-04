@@ -315,7 +315,9 @@ export const Header = forwardRef<HTMLElement, HeaderProps>((props, ref) => {
         selectedHeaderStyle === "levitation" ? "fixed" : "sticky",
         "top-0 left-0 right-0 flex z-10"
       )}
-      style={{ right: isSettingsOpen && !isMobile ? "20rem" : "0" }}>
+      style={{
+        right: isSettingsOpen && !isMobile ? "var(--setting-width)" : "0",
+      }}>
       <Card className="rounded-none w-full flex items-center justify-center">
         <div className="w-(--main-width) max-w-screen-2xl py-2 flex items-center justify-between">
           <div className="flex items-center theme-text-shadow text-accent-foreground">

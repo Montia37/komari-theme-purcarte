@@ -24,7 +24,9 @@ const Footer = forwardRef<
           : "",
         "bottom-0 left-0 right-0 flex z-10"
       )}
-      style={{ right: isSettingsOpen && !isMobile ? "20rem" : "0" }}>
+      style={{
+        right: isSettingsOpen && !isMobile ? "var(--setting-width)" : "0",
+      }}>
       <Card
         className={cn(
           selectedFooterStyle !== "followContent" ? "rounded-none" : "",

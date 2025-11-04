@@ -2,6 +2,7 @@
 
 export const defaultTexts = {
   node: {
+    _: "节点信息",
     name: "节点名称",
     details: "{name} 详情",
     cores: "Cores",
@@ -27,6 +28,7 @@ export const defaultTexts = {
     downloadPrefix: "↓",
   },
   header: {
+    _: "标题栏",
     toggleView: "切换视图",
     grid: "网格视图",
     compact: "紧凑视图",
@@ -38,10 +40,12 @@ export const defaultTexts = {
     admin: "管理员",
   },
   footer: {
+    _: "底栏",
     poweredBy: "Powered by",
     themeBy: "Theme by",
   },
   homePage: {
+    _: "主页",
     loadingData: "正在努力获取数据中...",
     noDetailsAvailable: "未启用详细信息与延迟图表",
     errorFetchingNodes: "获取节点数据失败",
@@ -51,11 +55,13 @@ export const defaultTexts = {
     addNode: "添加节点",
   },
   group: {
+    _: "分组",
     name: "分组",
     selectTitle: "选择分组",
     all: "所有",
   },
   sort: {
+    _: "排序",
     title: "排序方式",
     trafficUp: "按上传流量",
     trafficDown: "按下载流量",
@@ -64,6 +70,7 @@ export const defaultTexts = {
     reset: "重置排序",
   },
   search: {
+    _: "搜索",
     placeholder: "搜索服务器...",
     notFound: "Not Found",
     tryChangingFilters: "请尝试更改筛选条件",
@@ -71,6 +78,7 @@ export const defaultTexts = {
     retry: "重试",
   },
   statsBar: {
+    _: "状态栏",
     currentTime: "当前时间",
     displayOptionsTitle: "状态显示设置",
     currentOnline: "当前在线",
@@ -82,6 +90,7 @@ export const defaultTexts = {
     statsHidden: "统计信息已隐藏",
   },
   instancePage: {
+    _: "详情页",
     title: "详细信息",
     cpu: "CPU",
     architecture: "架构",
@@ -107,6 +116,7 @@ export const defaultTexts = {
     optionPing: "延迟",
   },
   chart: {
+    _: "图表信息",
     loading: "正在加载图表...",
     loadingData: "正在加载图表数据...",
     noData: "暂无数据",
@@ -138,11 +148,13 @@ export const defaultTexts = {
     oneQuarter: "四分之一",
   },
   notFoundPage: {
+    _: "404页面",
     title: "404 - Not Found",
     description: "The page you are looking for does not exist.",
     goToHome: "Go to Home",
   },
   privatePage: {
+    _: "私有页面",
     title: "站点已设为私有",
     description: "登录后才能获取数据",
     goToLogin: "前往登录",
@@ -156,5 +168,32 @@ export const otherTexts = {
       '<h2 class="text-lg font-bold">关于数据平滑的提示</h2><p>当您开启平滑后，您在统计图中看到的曲线经过<strong>指数加权移动平均 (EWMA)</strong> 算法处理，这是一种常用的数据平滑技术。</p></br><p>需要注意的是，经过EWMA算法平滑后的曲线所展示的数值，<strong>并非原始的、真实的测量数据</strong>。它们是根据EWMA算法计算得出的一个<strong>平滑趋势线</strong>，旨在减少数据波动，使数据模式和趋势更容易被识别。</p></br><p>因此，您看到的数值更像是<strong>视觉上的呈现</strong>，帮助您更好地理解数据的整体走向和长期趋势，而不是每一个时间点的精确真实值。如果您需要查看具体、原始的数据点，请参考未经平滑处理的数据视图。</p>',
     connectBreaksTooltipContent:
       '<h2 class="text-lg font-bold">关于连接断点的提示</h2><p><strong>默认关闭，可在后台配置</strong></p><p>当您开启"连接断点"功能后，图表中的曲线将会跨过那些由于网络问题或其他原因导致的丢包点，形成一条连续的线条。同时，系统会在丢包位置显示<strong>半透明的垂直参考线</strong>来标记断点位置。</p>',
+  },
+  setting: {
+    title: "编辑配置",
+    home: "🏠",
+    customUI: "UI 自定义",
+    close: "关闭",
+    import: "导入",
+    export: "导出",
+    togglePreview: {
+      on: "关闭预览",
+      off: "开启预览",
+    },
+    reset: "重置",
+    save: "保存",
+    back: "返回",
+    unsavedChanges: "有未保存的更改",
+    unsavedChangesDesc: "配置已恢复到上次保存的状态",
+    saveSuccess: "配置已保存！",
+    saveError: "保存配置失败！",
+    resetConfirm: "确定要重置所有配置吗？",
+    resetConfirmAction: "确定",
+    importSuccess: "导入成功，是否立即保存？",
+    importError: "导入配置失败！",
+    fetchError: "Failed to fetch theme settings config:",
+    saveThemeError: "Failed to save theme settings:",
+    importConfigError: "Failed to import config:",
+    cancel: "撤销",
   },
 };

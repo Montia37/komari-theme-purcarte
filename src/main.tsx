@@ -249,7 +249,7 @@ export const AppContent = () => {
     if (isSettingsOpen && !isMobile) {
       document.documentElement.style.setProperty(
         "--main-width",
-        `calc(${mainWidth}vw - 20rem)`
+        `calc(${mainWidth}vw - var(--setting-width))`
       );
     } else {
       document.documentElement.style.setProperty(

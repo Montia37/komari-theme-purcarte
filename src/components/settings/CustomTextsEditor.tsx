@@ -12,26 +12,23 @@ import { cn } from "@/utils";
 interface CustomTextsEditorProps {
   value: string;
   onChange: (value: string) => void;
-  onPageChange?: (page: string) => void;
+  page: string;
+  onPageChange: (page: string) => void;
 }
 
 const CustomTextsEditor = ({
   value,
   onChange,
+  page,
   onPageChange,
 }: CustomTextsEditorProps) => {
   const [editingTexts, setEditingTexts] = useState<Record<string, string>>({});
-  const [currentPage, setCurrentPage] = useState("main");
   const flatDefaultTexts = flattenObject(defaultTexts);
   const topLevelKeys = Object.keys(defaultTexts);
 
   useEffect(() => {
     setEditingTexts(parseCustomTexts(value));
   }, [value]);
-
-  useEffect(() => {
-    onPageChange?.(currentPage);
-  }, [currentPage, onPageChange]);
 
   const handleTextChange = (key: string, newValue: string) => {
     const newEditingTexts = { ...editingTexts };
@@ -46,22 +43,19 @@ const CustomTextsEditor = ({
 
   return (
     <div>
-      {currentPage === "main" ? (
+      {page === "main" ? (
         topLevelKeys.map((key) => (
           <Button
             key={key}
-            onClick={() => setCurrentPage(key)}
+            onClick={() => onPageChange(key)}
             className="w-full justify-start mb-2">
-            {key}
+            {(defaultTexts[key as keyof typeof defaultTexts] as any)?._ || key}
           </Button>
         ))
       ) : (
         <>
-          <Button onClick={() => setCurrentPage("main")} className="mb-4">
-            返回
-          </Button>
           {Object.keys(flatDefaultTexts)
-            .filter((key) => key.startsWith(currentPage))
+            .filter((key) => key.startsWith(page) && !key.endsWith("._"))
             .map((key) => (
               <div key={key} className="mb-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">

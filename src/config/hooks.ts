@@ -2,7 +2,7 @@ import { useContext, useCallback } from "react";
 import { ConfigContext } from "./ConfigContext";
 import type { ConfigContextType } from "./ConfigContext";
 import { DEFAULT_CONFIG } from "./default";
-import { defaultTexts } from "./locales";
+import { defaultTexts, otherTexts } from "./locales";
 
 /**
  * 安全地获取嵌套对象的属性
@@ -31,7 +31,8 @@ type Paths<T, P extends string = ""> = T extends object
     }[keyof T]
   : never;
 
-type LocaleKeys = Paths<typeof defaultTexts>;
+type MergedTexts = typeof defaultTexts & typeof otherTexts;
+type LocaleKeys = Paths<MergedTexts>;
 
 /**
  * 使用全局配置 Hook，用于获取当前应用配置

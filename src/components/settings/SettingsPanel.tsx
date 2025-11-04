@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useAppConfig } from "@/config/hooks";
+import { ArrowLeft } from "lucide-react";
+import { useAppConfig, useLocale } from "@/config/hooks";
 import type { ConfigOptions } from "@/config/default";
 import { DEFAULT_CONFIG } from "@/config/default";
+import { defaultTexts } from "@/config/locales";
 import { apiService } from "@/services/api";
 import SettingItem from "./SettingItem";
 import CustomTextsEditor from "./CustomTextsEditor";
@@ -15,33 +17,7 @@ interface SettingsPanelProps {
 }
 
 const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
-  const texts = {
-    title: "编辑配置",
-    customUI: "UI 自定义",
-    close: "关闭",
-    import: "导入",
-    export: "导出",
-    togglePreview: {
-      on: "关闭预览",
-      off: "开启预览",
-    },
-    reset: "重置",
-    save: "保存",
-    back: "返回",
-    unsavedChanges: "有未保存的更改",
-    unsavedChangesDesc: "配置已恢复到上次保存的状态",
-    saveSuccess: "配置已保存！",
-    saveError: "保存配置失败！",
-    resetConfirm: "确定要重置所有配置吗？",
-    resetConfirmAction: "确定",
-    importSuccess: "导入成功，是否立即保存？",
-    importError: "导入配置失败！",
-    fetchError: "Failed to fetch theme settings config:",
-    saveThemeError: "Failed to save theme settings:",
-    importConfigError: "Failed to import config:",
-    cancel: "撤销",
-  };
-
+  const { t } = useLocale();
   const config = useAppConfig();
   const { publicSettings, updatePreviewConfig, reloadConfig } = config;
   const [settingsConfig, setSettingsConfig] = useState<any[]>([]);
@@ -65,13 +41,13 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
           const data = await response.json();
           setSettingsConfig(data.configuration.data);
         } catch (error) {
-          console.error(texts.fetchError, error);
+          console.error(t("setting.fetchError"), error);
         }
       }
     };
 
     fetchSettingsConfig();
-  }, [publicSettings?.theme, texts.fetchError]);
+  }, [publicSettings?.theme, t]);
 
   useEffect(() => {
     setEditingConfig(publicSettings?.theme_settings || {});
@@ -107,7 +83,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
         publicSettings?.theme || "",
         editingConfig
       );
-      toast.success(texts.saveSuccess);
+      toast.success(t("setting.saveSuccess"));
       if (toastId.current) {
         toast.dismiss(toastId.current);
         toastId.current = null;
@@ -115,23 +91,15 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
       await reloadConfig();
       onClose();
     } catch (error) {
-      console.error(texts.saveThemeError, error);
-      toast.error(texts.saveError);
+      console.error(t("setting.saveThemeError"), error);
+      toast.error(t("setting.saveError"));
     }
-  }, [
-    editingConfig,
-    onClose,
-    publicSettings,
-    reloadConfig,
-    texts.saveError,
-    texts.saveSuccess,
-    texts.saveThemeError,
-  ]);
+  }, [editingConfig, onClose, publicSettings, reloadConfig, t]);
 
   const handleReset = () => {
-    toast(texts.resetConfirm, {
+    toast(t("setting.resetConfirm"), {
       action: {
-        label: texts.resetConfirmAction,
+        label: t("setting.resetConfirmAction"),
         onClick: () => {
           setEditingConfig(DEFAULT_CONFIG);
           if (toastId.current) {
@@ -145,13 +113,13 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
 
   useEffect(() => {
     if (hasUnsavedChanges && !toastId.current) {
-      toastId.current = toast(texts.unsavedChanges, {
+      toastId.current = toast(t("setting.unsavedChanges"), {
         duration: Infinity,
         cancel: {
-          label: texts.cancel,
-          onClick: () => {
-            reloadConfig();
-            toast.success(texts.unsavedChangesDesc);
+          label: t("setting.cancel"),
+          onClick: async () => {
+            await reloadConfig();
+            toast.success(t("setting.unsavedChangesDesc"));
           },
         },
       });
@@ -159,13 +127,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
       toast.dismiss(toastId.current);
       toastId.current = null;
     }
-  }, [
-    hasUnsavedChanges,
-    reloadConfig,
-    texts.cancel,
-    texts.unsavedChanges,
-    texts.unsavedChangesDesc,
-  ]);
+  }, [hasUnsavedChanges, reloadConfig, t]);
 
   const handlePreviewToggle = () => {
     if (isPreviewing) {
@@ -203,15 +165,15 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
             }
           }
           setEditingConfig(sanitizedConfig);
-          toast.success(texts.importSuccess, {
+          toast.success(t("setting.importSuccess"), {
             action: {
-              label: texts.save,
+              label: t("setting.save"),
               onClick: () => setTimeout(() => handleSave(), 300),
             },
           });
         } catch (error) {
-          console.error(texts.importConfigError, error);
-          toast.error(texts.importError);
+          console.error(t("setting.importConfigError"), error);
+          toast.error(t("setting.importError"));
         }
       };
       reader.readAsText(file);
@@ -220,14 +182,14 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
 
   const panelClasses = isMobile
     ? "fixed bottom-0 left-0 w-full h-3/4 bg-gray-100/90 dark:bg-gray-900/90 theme-card-style shadow-lg z-50 p-4 overflow-y-auto transform transition-transform duration-300 ease-in-out"
-    : "h-screen w-80 bg-gray-100/90 dark:bg-gray-900/90 theme-card-style shadow-lg p-4 overflow-y-auto flex-shrink-0";
+    : "h-screen w-(--setting-width) bg-gray-100/90 dark:bg-gray-900/90 theme-card-style shadow-lg p-4 overflow-y-auto flex-shrink-0";
 
   if (!isOpen) return null;
 
   return (
     <div className={panelClasses}>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">{texts.title}</h2>
+        <h2 className="text-xl font-bold">{t("setting.title")}</h2>
         <Button
           onClick={() => {
             if (isPreviewing) {
@@ -236,13 +198,13 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
             onClose();
           }}
           variant="ghost">
-          {texts.close}
+          {t("setting.close")}
         </Button>
       </div>
       <div className="flex flex-wrap gap-2 mb-4">
         <Button asChild>
           <label htmlFor="import-config">
-            {texts.import}
+            {t("setting.import")}
             <input
               id="import-config"
               type="file"
@@ -252,14 +214,82 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
             />
           </label>
         </Button>
-        <Button onClick={handleExport}>{texts.export}</Button>
+        <Button onClick={handleExport}>{t("setting.export")}</Button>
         <Button onClick={handlePreviewToggle}>
-          {isPreviewing ? texts.togglePreview.on : texts.togglePreview.off}
+          {isPreviewing
+            ? t("setting.togglePreview.on")
+            : t("setting.togglePreview.off")}
         </Button>
-        <Button onClick={handleReset}>{texts.reset}</Button>
+        <Button onClick={handleReset}>{t("setting.reset")}</Button>
         <Button onClick={handleSave} className="bg-green-500">
-          {texts.save}
+          {t("setting.save")}
         </Button>
+      </div>
+      <div className="flex items-center mb-4">
+        <span
+          onClick={() => {
+            if (currentPage === "main" && customTextsPage === "main") return;
+            if (customTextsPage !== "main") {
+              setCustomTextsPage("main");
+            } else {
+              setCurrentPage("main");
+            }
+          }}
+          className={`mr-2 cursor-pointer hover:underline ${
+            currentPage === "main" && customTextsPage === "main"
+              ? "invisible"
+              : ""
+          }`}>
+          <ArrowLeft className="h-4 w-4" />
+        </span>
+        <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center flex-wrap">
+          <span
+            className={
+              currentPage !== "main"
+                ? "cursor-pointer hover:underline"
+                : "cursor-default"
+            }
+            onClick={() => {
+              if (currentPage !== "main") {
+                setCurrentPage("main");
+                setCustomTextsPage("main");
+              }
+            }}>
+            {t("setting.home")}
+          </span>
+          {currentPage !== "main" && (
+            <>
+              <span className="mx-1">/</span>
+              <span
+                className={
+                  currentPage === t("setting.customUI") &&
+                  customTextsPage !== "main"
+                    ? "cursor-pointer hover:underline"
+                    : "cursor-default"
+                }
+                onClick={() => {
+                  if (currentPage === t("setting.customUI")) {
+                    setCustomTextsPage("main");
+                  }
+                }}>
+                {currentPage}
+              </span>
+            </>
+          )}
+          {currentPage === t("setting.customUI") &&
+            customTextsPage !== "main" && (
+              <>
+                <span className="mx-1">/</span>
+                <span className="cursor-default">
+                  {(
+                    defaultTexts[
+                      customTextsPage as keyof typeof defaultTexts
+                    ] as any
+                  )?._ || customTextsPage}
+                </span>
+              </>
+            )}
+        </div>
       </div>
       <div className="space-y-4">
         {currentPage === "main" ? (
@@ -275,12 +305,6 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
             ))
         ) : (
           <>
-            {currentPage === texts.customUI &&
-            customTextsPage !== "main" ? null : (
-              <Button onClick={() => setCurrentPage("main")} className="mb-4">
-                {texts.back}
-              </Button>
-            )}
             {settingsConfig
               .slice(
                 settingsConfig.findIndex((item) => item.name === currentPage) +
@@ -309,6 +333,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                     onChange={(value) =>
                       handleConfigChange("customTexts", value)
                     }
+                    page={customTextsPage}
                     onPageChange={setCustomTextsPage}
                   />
                 ) : (
