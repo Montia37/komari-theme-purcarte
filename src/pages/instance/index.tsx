@@ -58,8 +58,14 @@ const InstancePage = () => {
     );
 
     if (maxPingRecordPreserveTime > 720) {
+      const dynamicLabel =
+        maxPingRecordPreserveTime % 24 === 0
+          ? t("instancePage.days", {
+              count: Math.floor(maxPingRecordPreserveTime / 24),
+            })
+          : t("instancePage.hours", { count: maxPingRecordPreserveTime });
       filtered.push({
-        label: t("instancePage.hours", { count: maxPingRecordPreserveTime }),
+        label: dynamicLabel,
         hours: maxPingRecordPreserveTime,
       });
     }
@@ -72,8 +78,14 @@ const InstancePage = () => {
       (range) => range.hours <= maxRecordPreserveTime
     );
     if (maxRecordPreserveTime > 720) {
+      const dynamicLabel =
+        maxRecordPreserveTime % 24 === 0
+          ? t("instancePage.days", {
+              count: Math.floor(maxRecordPreserveTime / 24),
+            })
+          : t("instancePage.hours", { count: maxRecordPreserveTime });
       filtered.push({
-        label: t("instancePage.hours", { count: maxRecordPreserveTime }),
+        label: dynamicLabel,
         hours: maxRecordPreserveTime,
       });
     }
