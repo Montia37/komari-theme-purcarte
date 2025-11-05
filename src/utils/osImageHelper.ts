@@ -73,7 +73,7 @@ const osConfigs: OSConfig[] = [
   },
   {
     name: "ImmortalWrt",
-    image: "/assets/os-openwrt.svg",
+    image: "/assets/logo/os-openwrt.svg",
     keywords: ["immortalwrt", "immortal", "emmortal"],
   },
   {
