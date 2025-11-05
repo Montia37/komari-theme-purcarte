@@ -209,7 +209,7 @@ export const NodeGrid = ({
             </div>
           )}
         </div>
-        {selectTrafficProgressStyle === "linear" && stats && (
+        {selectTrafficProgressStyle === "linear" && (
           <div className="mb-1">
             <div className="flex items-center justify-between">
               <span>{t("node.traffic")}</span>
@@ -257,7 +257,7 @@ export const NodeGrid = ({
             </span>
           </div>
         </div>
-        {selectTrafficProgressStyle === "circular" && stats && (
+        {selectTrafficProgressStyle === "circular" && (
           <div className="flex items-center justify-between text-xs">
             <span className="w-1/5">{t("node.traffic")}</span>
             <div className="flex items-center justify-between w-4/5">
