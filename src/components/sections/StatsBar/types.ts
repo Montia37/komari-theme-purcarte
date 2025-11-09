@@ -36,4 +36,6 @@ export interface StatsBarProps {
   onSort?: (key: SortKey, direction: "asc" | "desc") => void;
   sortKey?: SortKey;
   sortDirection?: "asc" | "desc";
+  selectedAnalysis?: string;
+  onSelectAnalysis?: (analysis: string) => void;
 }

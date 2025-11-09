@@ -157,7 +157,7 @@ export const allColors: ColorType[] = [
 export type AppearanceType = "light" | "dark" | "system";
 export const allAppearance: AppearanceType[] = ["light", "dark", "system"];
 
-export type ViewModeType = "grid" | "table" | "compact";
+export type ViewModeType = "grid" | "table" | "compact" | "analysis";
 
 export type SiteStatus =
   | "public"

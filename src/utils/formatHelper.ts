@@ -55,6 +55,18 @@ export const formatUptime = (seconds: number) => {
   return uptimeString;
 };
 
+export const formatBillingCycle = (billingCycle: number) => {
+  if (billingCycle < 0) return "一次性";
+  if (billingCycle === 30 || billingCycle === 31) return "月";
+  if (billingCycle >= 89 && billingCycle <= 92) return "季";
+  if (billingCycle >= 180 && billingCycle <= 183) return "半年";
+  if (billingCycle >= 364 && billingCycle <= 366) return "年";
+  if (billingCycle >= 730 && billingCycle <= 732) return "两年";
+  if (billingCycle >= 1095 && billingCycle <= 1097) return "三年";
+  if (billingCycle >= 1825 && billingCycle <= 1827) return "五年";
+  return `${billingCycle}天`;
+};
+
 export const formatPrice = (
   price: number,
   currency: string,
@@ -64,24 +76,7 @@ export const formatPrice = (
   if (price === 0) return "";
   if (!currency || !billingCycle) return "N/A";
 
-  let cycleStr = `${billingCycle}天`;
-  if (billingCycle < 0) {
-    return `${currency}${price.toFixed(2)}`;
-  } else if (billingCycle === 30 || billingCycle === 31) {
-    cycleStr = "月";
-  } else if (billingCycle >= 89 && billingCycle <= 92) {
-    cycleStr = "季";
-  } else if (billingCycle >= 180 && billingCycle <= 183) {
-    cycleStr = "半年";
-  } else if (billingCycle >= 364 && billingCycle <= 366) {
-    cycleStr = "年";
-  } else if (billingCycle >= 730 && billingCycle <= 732) {
-    cycleStr = "两年";
-  } else if (billingCycle >= 1095 && billingCycle <= 1097) {
-    cycleStr = "三年";
-  } else if (billingCycle >= 1825 && billingCycle <= 1827) {
-    cycleStr = "五年";
-  }
+  const cycleStr = formatBillingCycle(billingCycle);
 
   return `${currency}${price.toFixed(2)}/${cycleStr}`;
 };

@@ -10,6 +10,7 @@ import {
   SunMoon,
   CircleUserIcon,
   Menu,
+  BarChart,
 } from "lucide-react";
 import { forwardRef, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -45,6 +46,7 @@ const ViewModeIcons = {
   grid: Grid3X3,
   compact: Rows3,
   table: Table2,
+  analysis: BarChart,
 };
 
 const ThemeIcons = {
@@ -56,7 +58,7 @@ const ThemeIcons = {
 const ViewMenuItems = ({
   setViewMode,
 }: {
-  setViewMode: (mode: "grid" | "compact" | "table") => void;
+  setViewMode: (mode: "grid" | "compact" | "table" | "analysis") => void;
 }) => {
   const { t } = useLocale();
   return (
@@ -72,6 +74,10 @@ const ViewMenuItems = ({
       <DropdownMenuItem onClick={() => setViewMode("table")}>
         <Table2 className="size-4 mr-2 text-primary" />
         <span>{t("header.table")}</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => setViewMode("analysis")}>
+        <BarChart className="size-4 mr-2 text-primary" />
+        <span>{t("header.analysis")}</span>
       </DropdownMenuItem>
     </>
   );

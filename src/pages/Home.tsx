@@ -3,6 +3,7 @@ import { StatsBar } from "@/components/sections/StatsBar";
 import { NodeGridContainer } from "@/components/sections/NodeGrid";
 import { NodeCompactContainer } from "@/components/sections/NodeCompact";
 import { NodeTable } from "@/components/sections/NodeTable";
+import { NodeAnalysis } from "@/components/sections/NodeAnalysis";
 import Loading from "@/components/loading";
 import type { NodeData } from "@/types/node";
 import { useNodeData } from "@/contexts/NodeDataContext";
@@ -85,28 +86,33 @@ const HomePage: React.FC<HomePageProps> = ({
         />
       );
     }
+    if (viewMode === "analysis") {
+      return <NodeAnalysis nodes={filteredNodes} groups={groups} />;
+    }
     return null;
   };
 
   return (
     <div className="fade-in my-4">
-      {enableStatsBar && (!isShowStatsInHeader || isMobile) && (
-        <StatsBar
-          displayOptions={statusCardsVisibility}
-          setDisplayOptions={setStatusCardsVisibility}
-          stats={stats}
-          loading={loading}
-          isShowStatsInHeader={isShowStatsInHeader}
-          enableGroupedBar={enableGroupedBar}
-          groups={groups}
-          selectedGroup={selectedGroup}
-          onSelectGroup={setSelectedGroup}
-          onSort={handleSort}
-        />
-      )}
+      {enableStatsBar &&
+        (!isShowStatsInHeader || isMobile) &&
+        viewMode !== "analysis" && (
+          <StatsBar
+            displayOptions={statusCardsVisibility}
+            setDisplayOptions={setStatusCardsVisibility}
+            stats={stats}
+            loading={loading}
+            isShowStatsInHeader={isShowStatsInHeader}
+            enableGroupedBar={enableGroupedBar}
+            groups={groups}
+            selectedGroup={selectedGroup}
+            onSelectGroup={setSelectedGroup}
+            onSort={handleSort}
+          />
+        )}
 
-      {enableGroupedBar && !mergeGroupsWithStats && (
-        <div className="flex purcarte-blur theme-card-style overflow-auto whitespace-nowrap overflow-x-auto items-center min-w-[300px] text-primary space-x-4 px-4 my-4">
+      {enableGroupedBar && !mergeGroupsWithStats && viewMode !== "analysis" && (
+        <Card className="flex overflow-auto whitespace-nowrap overflow-x-auto items-center min-w-[300px] text-primary space-x-4 px-4 my-4">
           <span>{t("group.name")}</span>
           {groups?.map((group: string) => (
             <Button
@@ -117,7 +123,7 @@ const HomePage: React.FC<HomePageProps> = ({
               {group}
             </Button>
           ))}
-        </div>
+        </Card>
       )}
 
       <div className={cn("space-y-4", viewMode === "table" && "-mx-2 -mb-2")}>

@@ -8,6 +8,7 @@ import Tips from "./tips";
 
 interface TagProps extends React.HTMLAttributes<HTMLDivElement> {
   tags: string[];
+  themeColor?: ColorType;
 }
 
 // 解析带颜色的标签
@@ -77,7 +78,7 @@ const TagItem: React.FC<TagItemProps> = ({
 };
 
 const Tag = React.forwardRef<HTMLDivElement, TagProps>(
-  ({ className, tags, ...props }, ref) => {
+  ({ className, tags, themeColor, ...props }, ref) => {
     const { enableTransparentTags, tagDefaultColorList } = useAppConfig();
 
     const colorList = React.useMemo(() => {
@@ -93,7 +94,8 @@ const Tag = React.forwardRef<HTMLDivElement, TagProps>(
         {...props}>
         {tags.map((tag, index) => {
           const { color } = parseTagWithColor(tag);
-          const badgeColor = color || colorList[index % colorList.length];
+          const badgeColor =
+            themeColor || color || colorList[index % colorList.length];
           return (
             <TagItem
               key={index}
