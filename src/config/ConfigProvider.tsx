@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState, useMemo } from "react";
+import { type ReactNode, useEffect, useState, useMemo, useRef } from "react";
 import type { PublicInfo } from "@/types/node.d";
 import { ConfigContext } from "./ConfigContext";
 import { DEFAULT_CONFIG, type ConfigOptions, type SiteStatus } from "./default";
@@ -12,120 +12,172 @@ interface ConfigProviderProps {
   children: ReactNode;
 }
 
+interface InitializationState {
+  publicSettings: PublicInfo;
+  config: ConfigOptions;
+  siteStatus: SiteStatus;
+  loading: boolean;
+  isLoaded: boolean;
+}
+
+const ConfiguredContent = ({
+  isLoaded,
+  loading,
+  children,
+}: {
+  isLoaded: boolean;
+  loading: boolean;
+  children: ReactNode;
+}) => {
+  if (!isLoaded) {
+    return (
+      <Loading text="加载配置中..." className={!loading ? "fade-out" : ""} />
+    );
+  }
+  return <>{children}</>;
+};
+
 /**
  * 配置提供者组件，用于将配置传递给子组件
  */
 export function ConfigProvider({ children }: ConfigProviderProps) {
-  const [publicSettings, setPublicSettings] = useState<PublicInfo | null>(null);
-  const [config, setConfig] = useState<ConfigOptions | null>(null);
-  const [siteStatus, setSiteStatus] = useState<SiteStatus>("public");
+  const [initState, setInitState] = useState<InitializationState>({
+    publicSettings: {} as PublicInfo,
+    config: DEFAULT_CONFIG,
+    siteStatus: "public",
+    loading: true,
+    isLoaded: false,
+  });
   const [previewConfig, setPreviewConfig] =
-    useState<Partial<ConfigOptions> | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
+    useState<Partial<ConfigOptions>>(DEFAULT_CONFIG);
+  const baseTextsRef = useRef(defaultTexts);
 
-  const loadConfig = async () => {
-    try {
-      const { status, publicInfo } = await apiService.checkSiteStatus();
-      setSiteStatus(status);
-      setPublicSettings(publicInfo);
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const { status, publicInfo } = await apiService.checkSiteStatus();
+        let mergedConfig: ConfigOptions;
 
-      let mergedConfig: ConfigOptions;
-      if (publicInfo) {
-        const themeSettings =
-          (publicInfo.theme_settings as ConfigOptions) || {};
-        mergedConfig = {
-          ...DEFAULT_CONFIG,
-          ...themeSettings,
-          titleText:
-            themeSettings.titleText ||
-            publicInfo.sitename ||
-            DEFAULT_CONFIG.titleText,
-        };
-      } else {
-        mergedConfig = DEFAULT_CONFIG;
-      }
-      setConfig(mergedConfig);
+        if (publicInfo) {
+          const themeSettings =
+            (publicInfo.theme_settings as ConfigOptions) || {};
+          mergedConfig = {
+            ...DEFAULT_CONFIG,
+            ...themeSettings,
+            titleText:
+              themeSettings.titleText ||
+              publicInfo.sitename ||
+              DEFAULT_CONFIG.titleText,
+          };
+        } else {
+          mergedConfig = DEFAULT_CONFIG;
+        }
 
-      // Initialize RPC
-      if (mergedConfig.enableJsonRPC2Api) {
-        const versionInfo = await apiService.getVersion();
-        if (versionInfo && versionInfo.version) {
-          const match = versionInfo.version.match(/(\d+)\.(\d+)\.(\d+)/);
-          if (match) {
-            const [, major, minor, patch] = match.map(Number);
-            if (
-              major > 1 ||
-              (major === 1 && minor > 0) ||
-              (major === 1 && minor === 0 && patch >= 7)
-            ) {
-              apiService.useRpc = true;
-              getWsService().useRpc = true;
-              console.log("RPC has been enabled for API and WebSocket.");
+        baseTextsRef.current = mergedConfig.customTexts
+          ? mergeTexts(defaultTexts, mergedConfig.customTexts)
+          : defaultTexts;
+
+        if (mergedConfig.enableJsonRPC2Api) {
+          const versionInfo = await apiService.getVersion();
+          if (versionInfo && versionInfo.version) {
+            const match = versionInfo.version.match(/(\d+)\.(\d+)\.(\d+)/);
+            if (match) {
+              const [, major, minor, patch] = match.map(Number);
+              if (
+                major > 1 ||
+                (major === 1 && minor > 0) ||
+                (major === 1 && minor === 0 && patch >= 7)
+              ) {
+                apiService.useRpc = true;
+                getWsService().useRpc = true;
+                console.log("RPC has been enabled for API and WebSocket.");
+              }
             }
           }
         }
-      }
-    } catch (error) {
-      console.error("Failed to initialize site:", error);
-      setConfig(DEFAULT_CONFIG);
-      setSiteStatus("private-unauthenticated");
-    } finally {
-      setLoading(false);
-      setTimeout(() => setIsLoaded(true), 300);
-    }
-  };
 
-  useEffect(() => {
+        console.log("加载在线配置");
+        setInitState((prevState) => ({
+          ...prevState,
+          publicSettings: publicInfo,
+          config: mergedConfig,
+          siteStatus: status,
+          loading: false,
+        }));
+        setPreviewConfig(mergedConfig);
+      } catch (error) {
+        console.error("Failed to initialize site:", error);
+        baseTextsRef.current = DEFAULT_CONFIG.customTexts
+          ? mergeTexts(defaultTexts, DEFAULT_CONFIG.customTexts)
+          : defaultTexts;
+
+        setInitState((prevState) => ({
+          ...prevState,
+          config: DEFAULT_CONFIG,
+          siteStatus: "private-unauthenticated",
+          loading: false,
+        }));
+      }
+    };
+
     loadConfig();
   }, []);
 
+  useEffect(() => {
+    if (initState.loading === false && initState.isLoaded === false) {
+      const timer = setTimeout(() => {
+        setInitState((prevState) => ({ ...prevState, isLoaded: true }));
+        console.log("config loaded");
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [initState.loading, initState.isLoaded]);
+
   const texts = useMemo(() => {
-    const activeConfig = previewConfig
-      ? { ...config, ...previewConfig }
-      : config;
-    const baseTexts = activeConfig?.customTexts
-      ? mergeTexts(defaultTexts, activeConfig.customTexts)
-      : defaultTexts;
-    return deepMerge(baseTexts, otherTexts);
-  }, [config, previewConfig]);
+    console.log("加载文本配置=========");
+    console.log(previewConfig.blurValue);
+
+    if (previewConfig?.customTexts) {
+      const previewBaseTexts = mergeTexts(
+        defaultTexts,
+        previewConfig.customTexts
+      );
+      return deepMerge(previewBaseTexts, otherTexts);
+    }
+    return deepMerge(baseTextsRef.current, otherTexts);
+  }, [previewConfig]);
 
   const updatePreviewConfig = (newConfig: Partial<ConfigOptions>) => {
-    setPreviewConfig(newConfig);
-  };
+    console.log("更新预览配置", newConfig);
 
-  const reloadConfig = async () => {
-    setLoading(true);
-    await loadConfig();
+    setPreviewConfig(newConfig);
   };
 
   const activeConfig = useMemo(
     () =>
       previewConfig
-        ? { ...(config || DEFAULT_CONFIG), ...previewConfig }
-        : config || DEFAULT_CONFIG,
-    [config, previewConfig]
+        ? { ...initState.config, ...previewConfig }
+        : initState.config,
+    [initState.config, previewConfig]
   );
-
-  if (!isLoaded || !config) {
-    return (
-      <Loading text="加载配置中..." className={!loading ? "fade-out" : ""} />
-    );
-  }
 
   return (
     <ConfigContext.Provider
       value={{
         ...activeConfig,
-        titleText: config?.titleText || DEFAULT_CONFIG.titleText,
-        publicSettings,
-        siteStatus,
+        titleText: initState.config.titleText,
+        publicSettings: initState.publicSettings,
+        themeSettings: initState.config,
+        siteStatus: initState.siteStatus,
         texts,
         previewConfig,
         updatePreviewConfig,
-        reloadConfig,
       }}>
-      {children}
+      <ConfiguredContent
+        isLoaded={initState.isLoaded}
+        loading={initState.loading}>
+        {children}
+      </ConfiguredContent>
     </ConfigContext.Provider>
   );
 }

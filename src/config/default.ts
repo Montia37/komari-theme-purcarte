@@ -158,6 +158,12 @@ export type AppearanceType = "light" | "dark" | "system";
 export const allAppearance: AppearanceType[] = ["light", "dark", "system"];
 
 export type ViewModeType = "grid" | "table" | "compact" | "analysis";
+export const allViewModes: ViewModeType[] = [
+  "grid",
+  "table",
+  "compact",
+  "analysis",
+];
 
 export type SiteStatus =
   | "public"

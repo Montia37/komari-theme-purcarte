@@ -5,21 +5,21 @@ import type { PublicInfo } from "@/types/node.d";
 import { defaultTexts } from "./locales";
 
 export interface ConfigContextType extends ConfigOptions {
-  publicSettings: PublicInfo | null;
+  publicSettings: PublicInfo;
+  themeSettings: ConfigOptions;
   siteStatus: SiteStatus;
   texts: typeof defaultTexts;
-  previewConfig: Partial<ConfigOptions> | null;
+  previewConfig: Partial<ConfigOptions>;
   updatePreviewConfig: (newConfig: Partial<ConfigOptions>) => void;
-  reloadConfig: () => Promise<void>;
 }
 
 // 创建配置上下文
 export const ConfigContext = createContext<ConfigContextType>({
   ...DEFAULT_CONFIG,
-  publicSettings: null,
+  publicSettings: {} as PublicInfo,
+  themeSettings: DEFAULT_CONFIG,
   siteStatus: "public",
   texts: defaultTexts,
-  previewConfig: null,
+  previewConfig: DEFAULT_CONFIG,
   updatePreviewConfig: () => {},
-  reloadConfig: async () => {},
 });

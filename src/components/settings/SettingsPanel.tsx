@@ -19,11 +19,10 @@ interface SettingsPanelProps {
 const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   const { t } = useLocale();
   const config = useAppConfig();
-  const { publicSettings, updatePreviewConfig, reloadConfig } = config;
-  const [settingsConfig, setSettingsConfig] = useState<any[]>([]);
-  const [editingConfig, setEditingConfig] = useState<Partial<ConfigOptions>>(
-    {}
-  );
+  const { publicSettings, themeSettings, updatePreviewConfig } = config;
+  const settingsConfig = useRef<any[]>([]);
+  const [editingConfig, setEditingConfig] =
+    useState<Partial<ConfigOptions>>(themeSettings);
   const [currentPage, setCurrentPage] = useState("main");
   const [customTextsPage, setCustomTextsPage] = useState("main");
   const [isPreviewing, setIsPreviewing] = useState(true);
@@ -31,35 +30,30 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const toastId = useRef<string | number | null>(null);
 
+  const themeName = publicSettings.theme;
+
   useEffect(() => {
     const fetchSettingsConfig = async () => {
-      if (publicSettings?.theme) {
-        try {
-          const response = await fetch(
-            `/themes/${publicSettings.theme}/komari-theme.json`
-          );
-          const data = await response.json();
-          setSettingsConfig(data.configuration.data);
-        } catch (error) {
-          console.error(t("setting.fetchError"), error);
-        }
+      try {
+        const response = await fetch(`/themes/${themeName}/komari-theme.json`);
+        const data = await response.json();
+        settingsConfig.current = data.configuration.data;
+      } catch (error) {
+        console.error(t("setting.fetchError"), error);
       }
     };
 
     fetchSettingsConfig();
-  }, [publicSettings?.theme, t]);
+  }, [t, themeName]);
 
   useEffect(() => {
-    setEditingConfig(publicSettings?.theme_settings || {});
-  }, [publicSettings?.theme_settings]);
-
-  useEffect(() => {
-    updatePreviewConfig(editingConfig);
+    if (JSON.stringify(editingConfig) !== JSON.stringify(themeSettings)) {
+      updatePreviewConfig(editingConfig);
+    }
     const hasChanges =
-      JSON.stringify(editingConfig) !==
-      JSON.stringify(publicSettings?.theme_settings || {});
+      JSON.stringify(editingConfig) !== JSON.stringify(themeSettings);
     setHasUnsavedChanges(hasChanges);
-  }, [editingConfig, publicSettings?.theme_settings, updatePreviewConfig]);
+  }, [editingConfig, themeSettings, updatePreviewConfig]);
 
   useEffect(() => {
     return () => {
@@ -70,38 +64,47 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   }, []);
 
   const handleConfigChange = (key: keyof ConfigOptions, value: any) => {
-    const newConfig = { ...editingConfig, [key]: value };
-    setEditingConfig(newConfig);
-    if (isPreviewing) {
-      updatePreviewConfig(newConfig);
+    if (editingConfig[key] !== value) {
+      const newConfig = { ...editingConfig, [key]: value };
+      setEditingConfig(newConfig);
+      if (isPreviewing) {
+        updatePreviewConfig(newConfig);
+      }
     }
   };
 
+  const resetSettings = useCallback(() => {
+    setEditingConfig(themeSettings);
+    updatePreviewConfig(themeSettings);
+  }, [themeSettings, updatePreviewConfig]);
+
   const handleSave = useCallback(async () => {
     try {
-      await apiService.saveThemeSettings(
-        publicSettings?.theme || "",
+      const { status } = await apiService.saveThemeSettings(
+        themeName,
         editingConfig
       );
-      toast.success(t("setting.saveSuccess"));
+      if (status === "error") {
+        toast.error(t("setting.saveError"));
+      } else {
+        toast.success(t("setting.saveSuccess"));
+      }
       if (toastId.current) {
         toast.dismiss(toastId.current);
         toastId.current = null;
       }
-      await reloadConfig();
-      onClose();
     } catch (error) {
       console.error(t("setting.saveThemeError"), error);
       toast.error(t("setting.saveError"));
     }
-  }, [editingConfig, onClose, publicSettings, reloadConfig, t]);
+  }, [themeName, editingConfig, t]);
 
   const handleReset = () => {
     toast(t("setting.resetConfirm"), {
       action: {
         label: t("setting.resetConfirmAction"),
         onClick: () => {
-          setEditingConfig(DEFAULT_CONFIG);
+          setEditingConfig(themeSettings);
           if (toastId.current) {
             toast.dismiss(toastId.current);
             toastId.current = null;
@@ -118,7 +121,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
         cancel: {
           label: t("setting.cancel"),
           onClick: async () => {
-            await reloadConfig();
+            resetSettings();
             toast.success(t("setting.unsavedChangesDesc"));
           },
         },
@@ -127,11 +130,11 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
       toast.dismiss(toastId.current);
       toastId.current = null;
     }
-  }, [hasUnsavedChanges, reloadConfig, t]);
+  }, [hasUnsavedChanges, resetSettings, t, themeSettings]);
 
   const handlePreviewToggle = () => {
     if (isPreviewing) {
-      updatePreviewConfig({});
+      updatePreviewConfig(themeSettings);
       setIsPreviewing(false);
     } else {
       updatePreviewConfig(editingConfig);
@@ -142,10 +145,18 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   const handleExport = () => {
     const dataStr =
       "data:text/json;charset=utf-8," +
-      encodeURIComponent(JSON.stringify(publicSettings?.theme_settings || {}));
+      encodeURIComponent(JSON.stringify(themeSettings, null, 2));
     const downloadAnchorNode = document.createElement("a");
+    const date = new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", "_")
+      .replace(/:/g, "-");
     downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "komari-theme-config.json");
+    downloadAnchorNode.setAttribute(
+      "download",
+      `komari-theme-config-${date}.json`
+    );
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
@@ -193,7 +204,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
         <Button
           onClick={() => {
             if (isPreviewing) {
-              updatePreviewConfig({});
+              updatePreviewConfig(themeSettings);
             }
             onClose();
           }}
@@ -293,7 +304,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
       </div>
       <div className="space-y-4">
         {currentPage === "main" ? (
-          settingsConfig
+          settingsConfig.current
             .filter((item) => item.type === "title")
             .map((item) => (
               <Button
@@ -305,22 +316,23 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
             ))
         ) : (
           <>
-            {settingsConfig
+            {settingsConfig.current
               .slice(
-                settingsConfig.findIndex((item) => item.name === currentPage) +
-                  1,
-                settingsConfig.findIndex(
+                settingsConfig.current.findIndex(
+                  (item) => item.name === currentPage
+                ) + 1,
+                settingsConfig.current.findIndex(
                   (item, index) =>
                     index >
-                      settingsConfig.findIndex(
+                      settingsConfig.current.findIndex(
                         (item) => item.name === currentPage
                       ) && item.type === "title"
                 ) === -1
-                  ? settingsConfig.length
-                  : settingsConfig.findIndex(
+                  ? settingsConfig.current.length
+                  : settingsConfig.current.findIndex(
                       (item, index) =>
                         index >
-                          settingsConfig.findIndex(
+                          settingsConfig.current.findIndex(
                             (item) => item.name === currentPage
                           ) && item.type === "title"
                     )

@@ -133,8 +133,9 @@ export const useThemeManager = () => {
     selectThemeColor,
     selectedDefaultView,
     selectMobileDefaultView,
+    statusCardsVisibility: defaultstatusCardsVisibility,
+    enableLocalStorage,
   } = useAppConfig();
-  const defaultstatusCardsVisibility = useAppConfig().statusCardsVisibility;
   const isMobile = useIsMobile();
 
   const [appearance, setAppearance] = useStoredState<AppearanceType>(
@@ -157,10 +158,16 @@ export const useThemeManager = () => {
     if (selectMobileDefaultView && isMobile) {
       setViewMode(selectMobileDefaultView);
     }
-    if (!isMobile) {
+    if (!isMobile && !enableLocalStorage) {
       setViewMode(selectedDefaultView);
     }
-  }, [isMobile, selectMobileDefaultView, selectedDefaultView, setViewMode]);
+  }, [
+    enableLocalStorage,
+    isMobile,
+    selectMobileDefaultView,
+    selectedDefaultView,
+    setViewMode,
+  ]);
 
   const [statusCardsVisibility, setStatusCardsVisibility] = useStoredState(
     "statusCardsVisibility",
@@ -181,8 +188,10 @@ export const useThemeManager = () => {
   };
 
   useEffect(() => {
-    setColor(selectThemeColor);
-  }, [selectThemeColor, setColor]);
+    if (!enableLocalStorage) {
+      setColor(selectThemeColor);
+    }
+  }, [selectThemeColor, setColor, enableLocalStorage]);
 
   const resolvedAppearance = useSystemTheme(appearance);
 

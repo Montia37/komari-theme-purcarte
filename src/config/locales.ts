@@ -218,7 +218,7 @@ export const otherTexts = {
     unsavedChanges: "有未保存的更改",
     unsavedChangesDesc: "配置已恢复到上次保存的状态",
     saveSuccess: "配置已保存！",
-    saveError: "保存配置失败！",
+    saveError: "保存配置失败！请重试",
     resetConfirm: "确定要重置所有配置吗？",
     resetConfirmAction: "确定",
     importSuccess: "导入成功，是否立即保存？",

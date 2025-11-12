@@ -16,7 +16,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "group toast purcarte-blur theme-card-style !text-foreground !text-sm",
+            "group toast purcarte-blur theme-card-style !text-foreground !text-sm data-[type=error]:!border-red-600 data-[type=success]:!border-green-600",
           description: "text-secondary-foreground",
           actionButton:
             "theme-button !text-primary !text-sm inset-shadow-xs inset-shadow-(color:--accent-a4)",

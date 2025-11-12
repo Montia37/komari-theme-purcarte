@@ -225,7 +225,7 @@ class ApiService {
   // 检查站点状态
   async checkSiteStatus(): Promise<{
     status: SiteStatus;
-    publicInfo: PublicInfo | null;
+    publicInfo: PublicInfo;
   }> {
     const publicInfoResponse = await this.getPublicSettings();
     const meResponse = await this.getUserInfo();
@@ -250,7 +250,7 @@ class ApiService {
         return { status: "public", publicInfo: publicInfoResponse };
       }
     }
-    return { status: "private-unauthenticated", publicInfo: null };
+    return { status: "private-unauthenticated", publicInfo: {} as PublicInfo };
   }
 
   async saveThemeSettings(

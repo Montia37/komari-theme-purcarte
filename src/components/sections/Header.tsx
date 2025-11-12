@@ -390,8 +390,7 @@ export const Header = forwardRef<HTMLElement, HeaderProps>((props, ref) => {
             )}
 
             {isShowConfigEditButtonInLogined &&
-              (siteStatus === "authenticated" ||
-                siteStatus === "private-authenticated") && (
+              siteStatus.includes("authenticated") && (
                 <EditButton
                   onClick={() => setIsSettingsOpen && setIsSettingsOpen(true)}
                 />
